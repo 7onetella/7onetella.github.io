@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Template on DocDock Documentation</title>
+    <link>/tags/template/</link>
+    <description>Recent content in Template on DocDock Documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 08 May 2018 09:05:27 -0400</lastBuildDate>
+    
+	<atom:link href="/tags/template/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>AWS CloudFormation Template</title>
+      <link>/provisioning/cloudformation-template/</link>
+      <pubDate>Tue, 08 May 2018 09:05:27 -0400</pubDate>
+      
+      <guid>/provisioning/cloudformation-template/</guid>
+      <description>Motivation If anyone has to look at CloudFormation templates all day and compare revisions, compare with the ones you copied and pasted from, I can tell you that it&amp;rsquo;s a daunting task from my own experience. It used to make my head hurt. Writing cloudformation template is certainly important but it&amp;rsquo;s not fun. The only time I had fun with CloudFormation template was when I was not writing it.</description>
+    </item>
+    
+  </channel>
+</rss>

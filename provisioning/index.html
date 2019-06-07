@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>DocDock Documentation</title>
+    
+      <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="revised" content="2019-05-21T17:40:16 EDT">
+<title>Provisioning :: DocDock Documentation</title>
+<link rel="shortcut icon" href="/images/favicon.png" type="image/x-icon" />
+<link href="/css/font-awesome.min.css" rel="stylesheet">
+<link href="/css/nucleus.css" rel="stylesheet">
+<link href="/theme-flex/style.css" rel="stylesheet">
+
+<link rel="stylesheet" href="/css/bootstrap.min.css">
+<script src="/js/jquery-2.x.min.js"></script>
+<script type="text/javascript">
+      var baseurl = "\/";
+</script>
+<link rel="stylesheet" href="/css/custom.css">
+
+    
+  </head>
+  <body data-url="/provisioning/">
+    
+      <header>
+  <div class="logo">
+    
+	
+  
+    <p>7onetella</p>
+
+  
+
+
+  </div>
+  <div class="burger"><a href="javascript:void(0);" style="font-size:15px;">&#9776;</a></div>
+    <nav class="shortcuts">
+            <li class="" role="">
+                <a href="https://github.com/7onetella"  rel="noopener">
+                  <i class='fa fa-github'></i> <label>Github repo</label>
+                </a>
+            </li>
+    </nav>
+</header>
+<article>
+  <aside>
+    <ul class="menu">
+    <li data-nav-id="/provisioning/" class="dd-item parent active haschildren
+        ">
+      <div>
+      <a href="/provisioning/"><i class='fa fa-cloud-upload'></i>&nbsp;Provisioning</a>
+            <i class="fa fa-angle-down fa-lg category-icon"></i><i class="fa fa-circle-thin read-icon"></i>
+      </div>
+        <ul>
+      <li data-nav-id="/provisioning/aminator/" class="dd-item">
+        <div>
+          <a href="/provisioning/aminator/">
+            Baking using Aminator
+          </a><i class="fa fa-circle-thin read-icon"></i>
+        </div>
+    </li>
+      <li data-nav-id="/provisioning/foundation-image/" class="dd-item">
+        <div>
+          <a href="/provisioning/foundation-image/">
+            Foundation Image
+          </a><i class="fa fa-circle-thin read-icon"></i>
+        </div>
+    </li>
+      <li data-nav-id="/provisioning/cloudformation-template/" class="dd-item">
+        <div>
+          <a href="/provisioning/cloudformation-template/">
+            AWS CloudFormation Template
+          </a><i class="fa fa-circle-thin read-icon"></i>
+        </div>
+    </li>
+      <li data-nav-id="/provisioning/_header/" class="dd-item">
+        <div>
+          <a href="/provisioning/_header/">
+            
+          </a><i class="fa fa-circle-thin read-icon"></i>
+        </div>
+    </li>
+        </ul>
+    </li>
+    <li data-nav-id="/demo/" class="dd-item alwaysopen haschildren
+        ">
+      <div>
+      <a href="/demo/"><i class='fa fa-tv'></i>&nbsp;Demo</a>
+            <i class="fa fa-angle-down fa-lg category-icon"></i><i class="fa fa-circle-thin read-icon"></i>
+      </div>
+        <ul>
+      <li data-nav-id="/demo/_header/" class="dd-item">
+        <div>
+          <a href="/demo/_header/">
+            
+          </a><i class="fa fa-circle-thin read-icon"></i>
+        </div>
+    </li>
+        </ul>
+    </li>
+
+
+
+
+    </ul>
+    <section>
+    </section>
+  </aside>
+  <section class="page">
+    
+    <div class="nav-select">
+      <center>Navigation : 
+        <select onchange="javascript:location.href = this.value;">
+          
+    <option value="/provisioning/"  selected>
+   Provisioning</option> 
+      <option value="/provisioning/aminator/" >- Baking using Aminator</option>
+      <option value="/provisioning/foundation-image/" >- Foundation Image</option>
+      <option value="/provisioning/cloudformation-template/" >- AWS CloudFormation Template</option>
+      <option value="/provisioning/_header/" >- </option>
+  
+    <option value="/demo/" >
+   Demo</option> 
+      <option value="/demo/_header/" >- </option>
+  
+
+
+
+        </select>
+      </center>
+    </div>
+      <div>
+        <div class="searchbox">
+          <input data-search-input id="search-by" type="text" placeholder="Search...">
+        </div>
+        <script type="text/javascript" src="/js/lunr.min.js"></script>
+        <script type="text/javascript" src="/js/auto-complete.js"></script>
+        <link href="/css/auto-complete.css" rel="stylesheet">
+        <script type="text/javascript">
+          
+              var baseurl = "\/";
+          
+        </script>
+        <script type="text/javascript" src="/js/search.js"></script>
+      </div>
+    
+
+    <h1>Provisioning</h1>
+    
+    
+    
+
+
+
+<h1 id="overview">Overview</h1>
+
+<hr />
+
+<p>Provisioning to me is about creating something on top of existing infrastructure.</p>
+
+<p>For example,</p>
+
+<ul>
+<li>Provisioning a new service and its dependent resources</li>
+<li>Provisioning a new cloud environment</li>
+</ul>
+
+<h2 id="stateless-vs-stateful-application">Stateless vs Stateful application</h2>
+
+<hr />
+
+<p>We need talk little bit about stateless vs stateful application.</p>
+
+<ul>
+<li><p><strong>Stateless</strong> apps are the apps that can die and be replaced without much concern. For stateless app, we don&rsquo;t care if one instance died just because it crashed. Docker is perfect for this. We typically configure multiple instances to run. Life cycle of the docker instances are determined by some sort of orchestration tool. ECS is a good example of this.</p></li>
+
+<li><p><strong>Stateful</strong> apps are like database, redis, rabbitmq, jenkins, etc. Let&rsquo;s say, our database instance stopped. We would want to login to the box and take a look around. Unlike Docker instance, stateful instances stay around even after the crash. Stateful apps can be configured manually but more popular methods are done using Ansible, Chef or Puppet. Stateful apps tend to start off with a single instance.</p></li>
+</ul>
+
+<h3 id="frying">Frying</h3>
+
+<p>Using tools like Ansible, Chef or Puppet would be considered <strong>frying</strong>. Frying describes the process of updating running manchines. I often thought using tools like Chef or Puppet was only for Ops. Boy, was I wrong. I have discovered Ansible recently and it changed the way I think about provisioning stateful applications.</p>
+
+<p>I have provisioned the following <strong>stateful</strong> applications using Ansible.</p>
+
+<ul>
+<li>Jenkins</li>
+<li>ApacheDS LDAP server</li>
+<li>Graphite</li>
+<li>Grafana</li>
+<li>SlackBot</li>
+</ul>
+
+<p>There are good chance these instances will remain single instances when I use them in my development or production environment. Having these instances run as dockerized containers is something I have done before but regreted later on.</p>
+
+<h3 id="baking">Baking</h3>
+
+<p>Baking describes the process of creating immutable manchine images. Stateless apps can be instantiated from docker image or AMI(Amazon Machine Image). Docker is an excellent choice for <strong>stateless</strong> applications. I did run into an unique case for running Consul which is a service registry. It looked like life would be much simpler if I used EC2 instances for Consul. It&rsquo;s recommended by the creator of Consul to stand up at least three instances of Consul. I can employee frying to apply configuration change on three running instances. However, what if I wanted AWS Autocailing to ensure there are always three instances running? Then I would need to use AMIs. This process of creating AMI as known as <strong>baking</strong> can be done manually or automatically. I knew the manual step of creating AMIs but that won&rsquo;t scale if I need to make change to AMI image often. Also, it would be nice to be able to check in the change into git and have a build server <strong>bake</strong> the AMI when I check in my change.</p>
+
+<p>Aminator from Netflix is a good implementation for baking AMI. My article &ldquo;Baking using Aminator&rdquo; describe how this is done. One thing to note is that I am incorporating frying with baking to create AMIs. It&rsquo;s never either or. Aminator has a plugin machenism to apply changes using Ansible, Chef or Puppet.</p>
+
+
+
+    
+    
+        <div class="chevrons">
+    <div id="navigation">
+<a class="nav nav-prev" href="/" title=""> <i class="fa fa-chevron-left"></i><label></label></a>
+    <a class="nav nav-next" href="/provisioning/aminator/" title="Baking using Aminator" style="margin-right: 0px;"><label>Baking using Aminator</label><i class="fa fa-chevron-right"></i></a></div>
+  </div>
+
+  </section>
+</article>
+
+<footer>
+
+<div class="footline">
+    
+
+    
+
+    
+    <div class="date">
+        <i class='fa fa-calendar'></i> Last update on 01/05/2019
+    </div>
+    
+
+    
+    <div class="github-link">
+      <a href="https://github.com/vjeantet/hugo-theme-docdock/edit/master/exampleSite/content/provisioning/_index.md" target="blank"><i class="fa fa-code-fork"></i>
+        Improve this page</a>
+    </div>
+    
+  </div>
+
+
+	<div>
+
+
+  
+    <hr />
+
+<p>references font awesome icons <a href="https://fontawesome.com/v4.7.0/icons/">https://fontawesome.com/v4.7.0/icons/</a></p>
+
+  
+
+
+
+	</div>
+</footer>
+
+<script src="/js/clipboard.min.js"></script>
+
+<link href="/css/featherlight.min.css" rel="stylesheet">
+<script src="/js/featherlight.min.js"></script>
+
+
+
+<script src="/theme-flex/script.js"></script>
+
+
+    
+
+    
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,183 @@
+[
+{
+	"uri": "/provisioning/aminator/",
+	"title": "Baking using Aminator",
+	"tags": ["AWS", "devops", "AMI", "Baking", "Frying"],
+	"description": "",
+	"content": " Aminator workflow Aminator is a tool created by Netflix to help in baking AMIs. The Aminator workflow goes like this.\n EBS volume gets created EBS volume gets mounted on the server running Aminator Aminator chroot to the mounted EBS volume Installs software and tools EBS volume is detached Snapshot is taken off of the EBS volume AMI is created off of the snapshot  The current Aminator documentation on github is outdated. This blog post hopes to share some knowledge on how I got Aminator to work for me.\nBaking and frying Baking: One way of installing software on EC2 is cloud-init. The cloud-init script installs requisite software during bootup. However, anything can happen while downloading. If anyone is not familiar with cloud-init scripts, they are scripts specified in EC2 User Data. User Data is run during bootup.\nThe much better way of achieving this is called baking. Baking means creating immutable machine images. AMI is the final output in this case. The requisite software is pre-downloaded as part of the AMI, the machine image.\nBaking is good for autoscaling and fast EC2 startup time. Frying can be used as part of baking while creating AMI.\nFrying: generally describes using tools like Chef, Puppet, or Ansible to change the config or install software on a machine during runtime after bootup. For example, we can use Chef to rotate ssh keys, update /etc/resolver.conf, etc.\nAminator server setup I am running Aminator on Ubuntu 18. Python, pip, and Ansible are required.\n# apt-get install python -y # apt-get update \u0026amp;\u0026amp; sudo apt-get install python-pip -y # pip install ansible  Install my patched version of Aminator.\n# pip install git+https://github.com/7onetella/aminator.git#egg=aminator  The patch Github PR is here if you want to see the patch diff.\nWe use Ansible provisioner with Aminator. Install my patched version of Aminator ansible plugin.\n# pip install git+https://github.com/7onetella/ansible-provisioner.git#egg=aminatorplugins-ansible  The patch Github PR is here if you want to see the patch diff.\nWe need to update playbook source and destination path on /etc/aminator/plugins/aminator.plugins.provisioner.ansible.yml as the initial yml file references paths that are specific to Netflix. Source path is the path on Aminator server. Destination path is the path on the chrooted volume path.\n# vi /etc/aminator/plugins/aminator.plugins.provisioner.ansible.yml enabled: true # Location and content of local inventory file inventory_file_path: /etc/ansible inventory_file: local inventory_file_content: | 127.0.0.1 # This is the path to all Ansible playbooks on the Aminator server # (outside the chroot environment). These will be copied to 'playbooks_path_dest' playbooks_path_source: /root/playbooks # The location to store playbooks on the AMI playbooks_path_dest: /tmp/playbooks # Set to False to delete all files in 'playbooks_path_dest' before snapshotting # the volume keep_playbooks: True  Then you will need to add an environment that uses the Ansible provisioner to your /etc/aminator/environments.yml file. For example:\nec2_ansible_linux: cloud: ec2 distro: debian provisioner: ansible volume: linux blockdevice: linux finalizer: tagging_ebs  Now you are ready to use Aminator Creating Foundation Image Creating a foundation AMI has not been the easiest. I deviated from Aminiator WIKI page on how to create foundation AMI. You can see my failed attempt here. For now using Ubuntu 18 AMI from \u0026ldquo;Quick Start\u0026rdquo; page seems to be good enough.\nFoundation image only needs Ansible so python and pip get installed as prerequisite.\nWe need AWS credential OR EC2 instance with IAM role that has rights to create EBS, mount volume, take snapshot, create AMI, etc.\nI chose to use AWS credential\nexport AWS_ACCESS_KEY_ID=\u0026lt;YOUR ACCESS KEY ID\u0026gt; export AWS_SECRET_ACCESS_KEY=\u0026lt;YOUR SECRET ACCESS KEY ID\u0026gt;  Aminator input parameters\n   Param Note Possible Values     \u0026ndash;vm-type paravirtual has known CVE hvm or paravirtual   -e environments here   -partition disk partition. it\u0026rsquo;s required for hvm 1 ~ n   -B base AMI ID ami-0a313d6098716f372 is the current Ubuntu 18 AMD64 AMI   -i enables interactive mode     Run aminate -h to get help on list of parameters if you like.\nAminator execution only allows installing one software artifact which is python in our example. However we still need pip and ansible installed so we use interactive mode to cheat and install them manually.\n root# aminate -n foundation -B ami-0a313d6098716f372 \\ --enhanced-networking \\ --ena-networking \\ --arch x86_64 \\ --provisioner-ebs-type gp2 \\ --register-ebs-type gp2 \\ --vm-type hvm \\ --partition 1 \\ -e ec2_apt_linux \\ -i \\ python 2019-04-23 15:58:53 [INFO] Aminator 2.2.1.dev default configuration loaded 2019-04-23 15:58:53 [INFO] Detailed aminator output to /var/log/aminator/python-edhcux-201904231558.log 2019-04-23 15:58:53 [INFO] Beginning amination! Package: python 2019-04-23 15:58:53 [INFO] Connecting to EC2 2019-04-23 15:58:53 [INFO] Aminating in region us-east-1 2019-04-23 15:58:53 [INFO] Resolving base AMI 2019-04-23 15:58:53 [INFO] loading cached ami details for ami-0a313d6098716f372 2019-04-23 15:58:53 [INFO] Successfully resolved ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-20190212.1(ami-0a313d6098716f372) 2019-04-23 15:58:54 [INFO] Searching for an available block device 2019-04-23 15:58:54 [INFO] Block device /dev/xvdg allocated 2019-04-23 15:59:05 [INFO] Checking and repairing root volume as necessary 2019-04-23 15:59:05 [INFO] Attempting to resize root fs to fill volume 2019-04-23 15:59:05 [INFO] Growing partition if necessary 2019-04-23 15:59:06 [INFO] performing a repo install of python root# \u0026lt;==== you are dropped into chrooted terminal root# apt-get install python-pip \u0026lt;==== install pip root# pip install ansible \u0026lt;==== install ansible root# exit \u0026lt;==== exit to get out of chroot terminal session .... 2019-04-23 17:41:56 [INFO] Provisioning succeeded! .... This manual step is only needed for foundation AMI. It\u0026rsquo;s not ideal but this is the best I can do at this point.\nYour foundation image AMI should show up in AWS EC2 Dashboard. We will use foundation AMI ID in creating base image next. Make sure to grab the foundation AMI ID from AWS EC2 dashboard. Creating Base Image I chose to use Ansible provisioner to install software for base AMI. I could have used deb, rpm, Chef and Puppet provisioner.\nCheck out my Ansible playbook into /root/playbooks. the ansible plugin config from above section expects this location.\ncd /root git clone https://github.com/7onetella/playbooks.git  Animate the base\naminate -n base -e ec2_ansible_linux -B ami-1234567890-foundation-ami-id --extra-vars \u0026quot;ansible_distribution=Ubuntu\u0026quot; \\ --enhanced-networking \\ --ena-networking \\ --arch x86_64 \\ --provisioner-ebs-type gp2 \\ --register-ebs-type gp2 \\ --vm-type hvm \\ --partition 1 \\ base-ubuntu.yml  Your base AMI is now ready. Make sure to grab the base AMI ID from AWS EC2 dashboard to use during creation of application AMI. Creating Application AMI Define Ansible playbook for your application AMI. Repeat the same step from base AMI creation with your app ansible playbook.\nAnimate the application AMI\naminate -n myapp -e ec2_ansible_linux -B ami-1234567890-base-ami-id --extra-vars \u0026quot;myappvar1=foo\u0026quot; \\ --enhanced-networking \\ --ena-networking \\ --arch x86_64 \\ --provisioner-ebs-type gp2 \\ --register-ebs-type gp2 \\ --vm-type hvm \\ --partition 1 \\ myapp.yml  This concludes Creating AMI using Netflix Aminator. Application AMI Candidates\n Jenikins Application Image extends Java 11 base images\n Fabio Application Image\n Promethius Application Image\n LDAP server Application Image\n Consul Application Image\n Redis Application Image\n Grafana Application Image\n  \nTODO  Create Jenkins for aminating application AMI Use ServerSpec to validate the server image.  Reference material on baking and frying:\nThis talk gives a good overview on baking and frying. I would highly recommend it. YouTube Video - Packer @ Pinterst\nTools:\nA good way to creating deb package is using nfpm\n"
+},
+{
+	"uri": "/provisioning/foundation-image/",
+	"title": "Foundation Image",
+	"tags": ["Netflix", "Aminator", "AMI", "HowTo", "HVM"],
+	"description": "",
+	"content": " Purpose This is my notes on creating foundation image and how I failed. I found a workaround instead. I will come back to this later on for the sake of learning more about Linux boot process.\nBuilding Foundation AMI  apt-get update \u0026amp;\u0026amp; apt-get install -y python python-pip python3 python3-pip  Create the volume # aws ec2 create-volume --size 8 --volume-type standard --region us-east-1 --availability-zone us-east-1a --tag-specifications 'ResourceType=volume,Tags=[{Key=Name,Value=foundation-vol}]' { \u0026quot;AvailabilityZone\u0026quot;: \u0026quot;us-east-1a\u0026quot;, \u0026quot;Tags\u0026quot;: [ { \u0026quot;Value\u0026quot;: \u0026quot;foundation-vol\u0026quot;, \u0026quot;Key\u0026quot;: \u0026quot;Name\u0026quot; } ], \u0026quot;Encrypted\u0026quot;: false, \u0026quot;VolumeType\u0026quot;: \u0026quot;gp2\u0026quot;, \u0026quot;VolumeId\u0026quot;: \u0026quot;vol-057fc42f851326e6b\u0026quot;, \u0026quot;State\u0026quot;: \u0026quot;creating\u0026quot;, \u0026quot;Iops\u0026quot;: 100, \u0026quot;SnapshotId\u0026quot;: \u0026quot;\u0026quot;, \u0026quot;CreateTime\u0026quot;: \u0026quot;2019-04-18T15:49:25.000Z\u0026quot;, \u0026quot;Size\u0026quot;: 10 }  Make sure the volume is \u0026lsquo;Available\u0026rsquo; # aws ec2 describe-volumes --volume-ids vol-057fc42f851326e6b --region us-east-1 { \u0026quot;Volumes\u0026quot;: [ { \u0026quot;AvailabilityZone\u0026quot;: \u0026quot;us-east-1a\u0026quot;, \u0026quot;Attachments\u0026quot;: [], \u0026quot;Encrypted\u0026quot;: false, \u0026quot;VolumeType\u0026quot;: \u0026quot;gp2\u0026quot;, \u0026quot;VolumeId\u0026quot;: \u0026quot;vol-057fc42f851326e6b\u0026quot;, \u0026quot;State\u0026quot;: \u0026quot;available\u0026quot;, \u0026quot;Iops\u0026quot;: 100, \u0026quot;SnapshotId\u0026quot;: \u0026quot;\u0026quot;, \u0026quot;CreateTime\u0026quot;: \u0026quot;2019-04-18T15:46:32.781Z\u0026quot;, \u0026quot;Size\u0026quot;: 10 } ] }  Get instance id of the current EC2 instance instance_id=$(curl http://169.254.169.254/latest/meta-data/instance-id)  Attach volume # aws ec2 attach-volume --device /dev/xvdf --volume-id vol-057fc42f851326e6b --instance-id ${instance_id} --region us-east-1 { \u0026quot;AttachTime\u0026quot;: \u0026quot;2019-04-18T16:02:10.180Z\u0026quot;, \u0026quot;InstanceId\u0026quot;: \u0026quot;i-0dd1f97339d08b532\u0026quot;, \u0026quot;VolumeId\u0026quot;: \u0026quot;vol-057fc42f851326e6b\u0026quot;, \u0026quot;State\u0026quot;: \u0026quot;attaching\u0026quot;, \u0026quot;Device\u0026quot;: \u0026quot;/dev/xvdf\u0026quot; }  Download Ubuntu 16.04 LTS Top portion of this page http://cloud-images.ubuntu.com/releases/16.04/release/ has the tar file that contains img inside\ncurl -O http://cloud-images.ubuntu.com/releases/16.04/release/ubuntu-16.04-server-cloudimg-amd64.tar.gz  # time dd if=xenial-server-cloudimg-amd64.img of=/dev/xvdf 2037760+0 records in 2037760+0 records out 1043333120 bytes (1.0 GB, 995 MiB) copied, 86.3559 s, 12.1 MB/s  I think this is where the problem is. I looked for MBR records on the mounted volume after execution of dd completed. I didn\u0026rsquo;t find any. At this point, using existing Ubuntu AMI seemed more appealing.\n Detach volume # aws ec2 detach-volume --volume-id vol-057fc42f851326e6b --region us-east-1 { \u0026quot;AttachTime\u0026quot;: \u0026quot;2019-04-18T16:02:10.000Z\u0026quot;, \u0026quot;InstanceId\u0026quot;: \u0026quot;i-0dd1f97339d08b532\u0026quot;, \u0026quot;VolumeId\u0026quot;: \u0026quot;vol-0f9bbdab164f1bb47\u0026quot;, \u0026quot;State\u0026quot;: \u0026quot;detaching\u0026quot;, \u0026quot;Device\u0026quot;: \u0026quot;/dev/xvdf\u0026quot; }  Create snapshot # aws ec2 create-snapshot --description \u0026quot;foundation snapshot\u0026quot; --volume-id vol-057fc42f851326e6b --region us-east-1 --tag-specifications 'ResourceType=snapshot,Tags=[{Key=Name,Value=foundation-ami}]' { \u0026quot;Description\u0026quot;: \u0026quot;foundation snapshot\u0026quot;, \u0026quot;Tags\u0026quot;: [ { \u0026quot;Value\u0026quot;: \u0026quot;foundation-ami\u0026quot;, \u0026quot;Key\u0026quot;: \u0026quot;Name\u0026quot; } ], \u0026quot;Encrypted\u0026quot;: false, \u0026quot;VolumeId\u0026quot;: \u0026quot;vol-057fc42f851326e6b\u0026quot;, \u0026quot;State\u0026quot;: \u0026quot;pending\u0026quot;, \u0026quot;VolumeSize\u0026quot;: 10, \u0026quot;StartTime\u0026quot;: \u0026quot;2019-04-18T17:53:11.000Z\u0026quot;, \u0026quot;Progress\u0026quot;: \u0026quot;\u0026quot;, \u0026quot;OwnerId\u0026quot;: \u0026quot;055106649878\u0026quot;, \u0026quot;SnapshotId\u0026quot;: \u0026quot;snap-0d73511d18139bfed\u0026quot; }  TODO: Register AMI "
+},
+{
+	"uri": "/provisioning/cloudformation-template/",
+	"title": "AWS CloudFormation Template",
+	"tags": ["AWS", "cloudformation", "template", "devops", "ops"],
+	"description": "",
+	"content": " Motivation If anyone has to look at CloudFormation templates all day and compare revisions, compare with the ones you copied and pasted from, I can tell you that it\u0026rsquo;s a daunting task from my own experience. It used to make my head hurt. Writing cloudformation template is certainly important but it\u0026rsquo;s not fun. The only time I had fun with CloudFormation template was when I was not writing it.\nHow not to do it  You have large individual CF templates for services which includes cluster, alb, and services all in one. CloudFormation templates have huge number of input parameters. Giving resources explicit names in places you shouldn\u0026rsquo;t. Your input parameters are asking the users to enter data users don\u0026rsquo;t have a clue about. Unrelated AWS resources are grouped together.  "
+},
+{
+	"uri": "/about/",
+	"title": "About",
+	"tags": [],
+	"description": "About me and this site",
+	"content": "I am a software engineer. I like problem solving. I am good at polishing software. I like Linux and docker.\nHave you ever executed the following? I personally haven\u0026rsquo;t\nsudo su - root rm -rf /  Do you expect to keep your job after this?\nNo  Have you ever seen other people make this kind of mistake?\nYes  Welcome to my world\n"
+},
+{
+	"uri": "/contact/",
+	"title": "Contact",
+	"tags": [],
+	"description": "How to contact me",
+	"content": " Email: 7onetella @ gmail.com\n{{ fluid_imgs \u0026ldquo;pure-u-1-1|http://yoshiharuyamashita.com/img/post/dog.jpg|my image\u0026rdquo;\n}} "
+},
+{
+	"uri": "/_footer/",
+	"title": "",
+	"tags": [],
+	"description": "",
+	"content": "references font awesome icons https://fontawesome.com/v4.7.0/icons/\n"
+},
+{
+	"uri": "/_header/",
+	"title": "",
+	"tags": [],
+	"description": "",
+	"content": "7onetella\n"
+},
+{
+	"uri": "/",
+	"title": "",
+	"tags": [],
+	"description": "",
+	"content": " Automation \u0026amp; Technology Blog DevOps My definition of devops is about embracing the idea of empowering the developers to do automation beyond typical application coding.\nTopics I intend to spread my knowledge by creating posts related to\n Provisioning My journey into ChatOps Implementation Addressing development concerns in a consistent manner for build, logging, tracing, and metrics  Traces of automation should be evident in every article I write.\n"
+},
+{
+	"uri": "/demo/_header/",
+	"title": "",
+	"tags": [],
+	"description": "",
+	"content": "7onetella\n"
+},
+{
+	"uri": "/provisioning/_header/",
+	"title": "",
+	"tags": [],
+	"description": "",
+	"content": "7onetella\n"
+},
+{
+	"uri": "/tags/ami/",
+	"title": "Ami",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "/tags/aminator/",
+	"title": "Aminator",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "/tags/aws/",
+	"title": "Aws",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "/tags/baking/",
+	"title": "Baking",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "/categories/",
+	"title": "Categories",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "/tags/cloudformation/",
+	"title": "Cloudformation",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "/demo/",
+	"title": "Demo",
+	"tags": [],
+	"description": "",
+	"content": " Cloud in 45 minutes instead of 7 days It would be interesting to do a project where it demos things that are mentioned in my blog posts.\nLet\u0026rsquo;s follow this imaginary senario where there is an urgent need to deploy to cloud in 7 days.\n Did we say 7 days? That\u0026rsquo;s too long. We will do all of this in 45 minutes or less. I am going to assume you have your AWS setup with a VPC.\n Automate using Ansible scripts Prerequisite for using Ansible is that you need python and pip installed. Let\u0026rsquo;s go ahead and install them on your local machine.\napt-get install python2.7 apt-get install python-pip pip install ansible  Let\u0026rsquo;s check out my Ansible playbooks\ngit clone https://github.com/7onetella/playbooks.git cd playbooks  Make sure we have a hosts file like so in the playbooks folder\n[remote-server] 172.31.X.X ansible_connection=ssh ansible_port=22 ansible_user=ubuntu ansible_private_key_file=~/.aws/7onetella.pem  I personally like Debian distro like Ubuntu. Let\u0026rsquo;s start one and install Ansible required packages. Run the following in your local machine.\nexport AWS_ACCESS_KEY_ID=\u0026lt;YOUR_ACCESS_KEY_ID\u0026gt; export AWS_SECRET_ACCESS_KEY=\u0026lt;YOUR_SECRET_ACCESS_KEY\u0026gt; history -c aws ec2 run-instances \\ --image-id ami-0a313d6098716f372 \\ --count 1 \\ --instance-type t2.small \\ --key-name mtv-key-pair \\ --subnet-id subnet-936c5abb \\ --associate-public-ip-address \\ --instance-initiated-shutdown-behavior terminate \\ --block-device-mappings 'DeviceName=/dev/sda1,Ebs={VolumeSize=20,DeleteOnTermination=true,VolumeType=gp2}' \\ --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=RemoteServer}]'  ami-0a313d6098716f372 is an Ubuntu 18.04 image. It didn\u0026rsquo;t make sense to use previous versions when 18.04 is already not the latest. I had some trouble with Java 8 \u0026amp; Java 11 but everything worked out fine.\n ansible -i hosts remote-server --become -m raw -a \u0026quot;apt-get -y install python2.7\u0026quot; \\ \u0026amp;\u0026amp; ansible -i hosts remote-server --become -m raw -a \u0026quot;apt-get update\u0026quot; \\ \u0026amp;\u0026amp; ansible -i hosts remote-server --become -m raw -a \u0026quot;apt-get -y install python-pip\u0026quot; \\ \u0026amp;\u0026amp; ansible -i hosts remote-server --become -m raw -a \u0026quot;pip install ansible\u0026quot;  \nLet\u0026rsquo;s install a bunch in one go - ldap, jenkins, graphite, grafana and aminator ansible-playbook -i hosts --extra-vars \u0026quot;target=remote-server user=ubuntu\u0026quot; apacheds.yml \\ \u0026amp;\u0026amp; ansible-playbook -i hosts --extra-vars \u0026quot;target=remote-server\u0026quot; jenkins.yml \\ \u0026amp;\u0026amp; ansible-playbook -i hosts --extra-vars \u0026quot;target=remote-server user=ubuntu\u0026quot; graphite.yml \\ \u0026amp;\u0026amp; ansible-playbook -i hosts --extra-vars \u0026quot;target=remote-server user=ubuntu\u0026quot; grafana.yml \\ \u0026amp;\u0026amp; ansible-playbook -i hosts --extra-vars \u0026quot;target=remote-server playbook_user=jenkins\u0026quot; aminator.yml  Don\u0026rsquo;t get me wrong. I could have used docker for all these systems. I have used docker before on apps like Jenkins. I prefer fyring for stateful machines such as Jenkins, LDAP, Graphite and Grafana.\n Time to deploy our app? No, not yet! All of these following tasks are necessary to get our app deployed with dynamic routing. You may think that all this baking and frying is a bit much but the payoff is at the end. I have used ELB and ALB for many years. I am seeking two benefits from this work.\nDynamic Routing - Working with ECS has been great but it takes deployment of two ALBs to for me to do Blue Greeen deployment or mucking around with Listner Rule Priority. I would like to do Canary deployment as well. I feel like deployment is in dev\u0026rsquo;s control when dynamic router like Fabio is used. Fabio can be easily updated whereas ALB requires a bit more work.\nCloud agonostic service registry - AWS™ offers SRV record based service registy with Fargate ant whatnot. I think HashCorp™, Consul is really neat and easily portable between cloud service providers. Referring to logical names in Consul\u0026rsquo;s DNS service is much to be explored. A service tied to ALB must know the target physical end point names. That can make configuration and service deployment harder.\nso shall we do some baking?\n\nFoundation AMI Foundation AMI isn\u0026rsquo;t much. It\u0026rsquo;s a pristine version of Ubuntu with couple of useful packages. We will be using Foundation AMI when creating base AMI. All of our stateful machine images will be based off of base AMI.\nFoundation AMI will have the following minimal packages installed.\n python pip ansible  Here, I am going to cheat by manually installing these packages in a chrooted environment. chrooting is awesome for baking images in a very clean manner. No traces of logs to clean. No files are initialized to identify the name of machine etc. My blog post \u0026ldquo;Baking using Aminator\u0026rdquo; is exactly what this is. It\u0026rsquo;s just that all the manual setup steps for Aminator has been automated by my Ansible playbook.\n let\u0026rsquo;s ssh into remote-server and run the following.\nsudo su - root export AWS_ACCESS_KEY_ID=\u0026lt;YOUR_ACCESS_KEY_ID\u0026gt; export AWS_SECRET_ACCESS_KEY=\u0026lt;YOUR_SECRET_ACCESS_KEY\u0026gt; history -c aminate -n foundation_ubuntu -B ami-0a313d6098716f372 \\ --enhanced-networking \\ --ena-networking \\ --arch x86_64 \\ --provisioner-ebs-type gp2 \\ --register-ebs-type gp2 \\ --vm-type hvm \\ --partition 1 \\ -e ec2_apt_linux \\ -i \\ python 2019-04-23 15:58:53 [INFO] Aminator 2.2.1.dev default configuration loaded 2019-04-23 15:58:53 [INFO] Detailed aminator output to /var/log/aminator/python-edhcux-201904231558.log 2019-04-23 15:58:53 [INFO] Beginning amination! Package: python 2019-04-23 15:58:53 [INFO] Connecting to EC2 2019-04-23 15:58:53 [INFO] Aminating in region us-east-1 2019-04-23 15:58:53 [INFO] Resolving base AMI 2019-04-23 15:58:53 [INFO] loading cached ami details for ami-0a313d6098716f372 2019-04-23 15:58:53 [INFO] Successfully resolved ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-20190212.1(ami-0a313d6098716f372) 2019-04-23 15:58:54 [INFO] Searching for an available block device 2019-04-23 15:58:54 [INFO] Block device /dev/xvdg allocated 2019-04-23 15:59:05 [INFO] Checking and repairing root volume as necessary 2019-04-23 15:59:05 [INFO] Attempting to resize root fs to fill volume 2019-04-23 15:59:05 [INFO] Growing partition if necessary 2019-04-23 15:59:06 [INFO] performing a repo install of python root# \u0026lt;==== you are dropped into chrooted terminal root# apt-get install python-pip \u0026lt;==== install pip root# pip install ansible \u0026lt;==== install ansible root# exit \u0026lt;==== exit to get out of chroot terminal session .... 2019-04-23 17:41:56 [INFO] Provisioning succeeded! .... So that\u0026rsquo;s our Foundation AMI ~! Make sure to grab the generated foundation AMI ID from the consol output. It\u0026rsquo;s toward the end of the consol output. We will this AMI ID at the next step.\n Base AMI Okay, we need a bit more baking before deploying Consul for service registry, Fabio for dynamic route registration, so hang in there!\nBase AMI will include\n aws cli boto git-core less sudo sysstat unzip zip  On the remote-server execute the following\nsudo su - root export AWS_ACCESS_KEY_ID=\u0026lt;YOUR_ACCESS_KEY_ID\u0026gt; export AWS_SECRET_ACCESS_KEY=\u0026lt;YOUR_SECRET_ACCESS_KEY\u0026gt; history -c cd /var/playbooks export FOUNDATION_AMI_ID=\u0026lt;AMI ID from previous step\u0026gt; sudo -E aminate -n base_ubuntu -e ec2_ansible_linux -B ${FOUNDATION_AMI_ID} \\ --enhanced-networking \\ --ena-networking \\ --arch x86_64 \\ --provisioner-ebs-type gp2 \\ --register-ebs-type gp2 \\ --vm-type hvm \\ --partition 1 \\ base-ami-ubuntu.yml  \nAppliation AMI - Consul and Fabio Let\u0026rsquo;s bake image for Consul and deploy and repeat the same for Fabio.\nConsul - baking On the remote-server execute the following\nexport AWS_ACCESS_KEY_ID=\u0026lt;YOUR_ACCESS_KEY_ID\u0026gt; export AWS_SECRET_ACCESS_KEY=\u0026lt;YOUR_SECRET_ACCESS_KEY\u0026gt; history -c cd /var/playbooks export BASE_AMI=\u0026lt;Base AMI ID from previous step\u0026gt; sudo -E aminate -n consul-cluster -e ec2_ansible_linux -B ${BASE_AMI} --extra-vars \u0026quot;ansible_distribution=Ubuntu\u0026quot; \\ --enhanced-networking \\ --ena-networking \\ --arch x86_64 \\ --provisioner-ebs-type gp2 \\ --register-ebs-type gp2 \\ --vm-type hvm \\ --partition 1 \\ consul-cluster.yml  Consul - launching Grab the AMI ID from consol output and use it in the following command to finally launch Consol. It\u0026rsquo;s recommended to use min of three instances for redundancy.\naws ec2 run-instances \\ --image-id \u0026lt;CONSUL_AMI_ID\u0026gt; \\ --count 3 \\ --instance-type t2.medium \\ --key-name mtv-key-pair \\ --subnet-id subnet-936c5abb \\ --associate-public-ip-address \\ --instance-initiated-shutdown-behavior terminate \\ --block-device-mappings 'DeviceName=/dev/sda1,Ebs={VolumeSize=20,DeleteOnTermination=true,VolumeType=gp2}' \\ --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=Consul}]'  Create three A records in Route 53\n consul.example.com A 172.31.41.168 consul.example.com A 172.31.37.149 consul.example.com A 172.31.38.198  Attach IAM Role\nCreate a role called EC2ReadOnly with ec2:DescribeInstances permission and attach it to the three Consul ec2 instances. Our Consul instances will discover each other by calling \u0026ldquo;DescribeInstances\u0026rdquo; on ec2 instances before forming a cluster.\nYou can hit the Consul UI here =\u0026gt; http://consul.example.com:8500/ui Fabio - baking base ami: ami-022fcccf8bf7d91b5\nexport AWS_ACCESS_KEY_ID=\u0026lt;YOUR_ACCESS_KEY_ID\u0026gt; export AWS_SECRET_ACCESS_KEY=\u0026lt;YOUR_SECRET_ACCESS_KEY\u0026gt; history -c cd /var/playbooks export BASE_AMI=\u0026lt;Base AMI ID\u0026gt; sudo -E aminate -n fabio -e ec2_ansible_linux -B ${BASE_AMI} --extra-vars \u0026quot;target=all consul_cluster_hostname=consul.example.com\u0026quot; \\ --enhanced-networking \\ --ena-networking \\ --arch x86_64 \\ --provisioner-ebs-type gp2 \\ --register-ebs-type gp2 \\ --vm-type hvm \\ --partition 1 \\ fabio.yml  Fabio - launching Grab the AMI ID from consol output and use it in the following command to launch Fabio.\naws ec2 run-instances \\ --image-id \u0026lt;FABIO_AMI_ID\u0026gt; \\ --count 1 \\ --instance-type t2.medium \\ --key-name mtv-key-pair \\ --subnet-id subnet-936c5abb \\ --associate-public-ip-address \\ --instance-initiated-shutdown-behavior terminate \\ --block-device-mappings 'DeviceName=/dev/sda1,Ebs={VolumeSize=20,DeleteOnTermination=true,VolumeType=gp2}' \\ --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=FabioLB}]'  Create one A records in Route 53\n fabio.example.com A 172.31.41.100   Create ECS Base AMI We are getting very close to deploying our app. Our app will be deployed as ECS service. The app wil register itself with Consul as it comes up. It will deregister when it goes down. Fabio will pick up the route host/path info from Consul in the form of tags.\nI hate to disappoint anyone but I am cheating here again instead of full automation. We are building another foundation/base AMI for ECS. This AMI will be combination of a foundation \u0026amp; a base image. Lasiness always prevails. Don\u0026rsquo;t judge me.\n sudo su - root export AWS_ACCESS_KEY_ID=AKIAI3C4HGAAX2AOVXDA export AWS_SECRET_ACCESS_KEY=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 export base_ami=ami-00cf4737e238866a3 history -c sudo -E aminate -n base_ecs -B ${base_ami} \\ --enhanced-networking \\ --ena-networking \\ --arch x86_64 \\ --provisioner-ebs-type gp2 \\ --register-ebs-type gp2 \\ --vm-type hvm \\ --partition 1 \\ -i \\ python $ \u0026lt;=== You are dropped into chrooted terminal, interactive mode. Excute the following. yum install -y git \\ \u0026amp;\u0026amp; git clone https://github.com/7onetella/playbooks.git \\ \u0026amp;\u0026amp; cd playbooks \\ \u0026amp;\u0026amp; yum install -y python-pip \\ \u0026amp;\u0026amp; pip install ansible \\ \u0026amp;\u0026amp; ansible-playbook --extra-vars \u0026quot;consul_cluster_hostname=consul.example.com\u0026quot; consul-agent-local.yml \\ \u0026amp;\u0026amp; exit  BTW, ami-00cf4737e238866a3. This AMI is the official ECS Optimized AMI ID for us-east-1 region.\nWe will use the output AMI ID in EC2 Launch Configuration to launch multiple EC2 instances for running our apps. There are many YouTube videos on how to create Launch Configration, so I will skip this step. If you go to Consul UI now, you should see something similar to the following except the helloworld app. We will deploy our apps shortly. Everthing else that\u0026rsquo;s been deployed so far LDAP - You can use any ldap client to log in and take a look. I am using Apache Directory Studio. ApacheDS LDAP server is running on port 10389\nBind DN: uid=admin,ou=system\nBind Password: secret\nRegular User: doej\nReg. User Password: foo\nReg User Groups: developers and managers\n Jenkins - We will use Jenkins for what it does best.\nYou can optionally go to Jekins Global Security Page and set up Jenkins to use the LDAP for authentication.\nHere is the text config for easy copy and paste\n# Server: localhost:10389 # root DN: # User search base: dc=example,dc=com #\tUser search filter: uid={0} # Group search base: ou=groups,dc=example,dc=com # Group search filter: (objectclass=groupOfUniqueNames) # Group membership \u0026gt; Search for LDAP groups containing user \u0026gt; Group membership filter: # Manager DN: uid=admin,ou=system # Manager Password: secret # Display Name LDAP attribute: cn # Email Address LDAP attribute: mail  user: admin\npassword: password\n Graphite - will be used to capture metrics data. LDAP user doej and the password works here.\nLogin page is http://remote-server/account/login user: admin\npassword: password\n Grafana - is really awesome apps for curating graphs. LDAP user doej and the password works here.\nLogin page is http://remote-server:3000/login user: admin\npassword: password\n Humanoid - is our Slack App. This hasn\u0026rsquo;t been deployed yet. We will use Humanoid to do app deployment, LDAP user management, and release.\nExecute the following from your local machine to deploy humanoid\nansible-playbook -i hosts \\ --extra-vars \u0026quot;target=remote-server bot_access_token=\u0026lt;YOUR_BOT_ACCESS_TOEKN\u0026gt; bot_member_id=\u0026lt;YOUR_BOT_MEMBER_ID\u0026gt;\u0026quot; \\ humanoid.yml  Let\u0026rsquo;s deploy our app! Network topology for our app looks like this.\nmermaid.initialize({startOnLoad:true}); graph LR; subgraph VPC Consul Fabio OurApp end Developers -.- Fabio Fabio -.- Consul Fabio -.- OurApp OurApp -.- Consul  "
+},
+{
+	"uri": "/tags/devops/",
+	"title": "Devops",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "/tags/frying/",
+	"title": "Frying",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "/tags/howto/",
+	"title": "Howto",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "/tags/hvm/",
+	"title": "Hvm",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "/tags/netflix/",
+	"title": "Netflix",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "/tags/ops/",
+	"title": "Ops",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "/provisioning/",
+	"title": "Provisioning",
+	"tags": [],
+	"description": "",
+	"content": " Overview Provisioning to me is about creating something on top of existing infrastructure.\nFor example,\n Provisioning a new service and its dependent resources Provisioning a new cloud environment  Stateless vs Stateful application We need talk little bit about stateless vs stateful application.\n Stateless apps are the apps that can die and be replaced without much concern. For stateless app, we don\u0026rsquo;t care if one instance died just because it crashed. Docker is perfect for this. We typically configure multiple instances to run. Life cycle of the docker instances are determined by some sort of orchestration tool. ECS is a good example of this.\n Stateful apps are like database, redis, rabbitmq, jenkins, etc. Let\u0026rsquo;s say, our database instance stopped. We would want to login to the box and take a look around. Unlike Docker instance, stateful instances stay around even after the crash. Stateful apps can be configured manually but more popular methods are done using Ansible, Chef or Puppet. Stateful apps tend to start off with a single instance.\n  Frying Using tools like Ansible, Chef or Puppet would be considered frying. Frying describes the process of updating running manchines. I often thought using tools like Chef or Puppet was only for Ops. Boy, was I wrong. I have discovered Ansible recently and it changed the way I think about provisioning stateful applications.\nI have provisioned the following stateful applications using Ansible.\n Jenkins ApacheDS LDAP server Graphite Grafana SlackBot  There are good chance these instances will remain single instances when I use them in my development or production environment. Having these instances run as dockerized containers is something I have done before but regreted later on.\nBaking Baking describes the process of creating immutable manchine images. Stateless apps can be instantiated from docker image or AMI(Amazon Machine Image). Docker is an excellent choice for stateless applications. I did run into an unique case for running Consul which is a service registry. It looked like life would be much simpler if I used EC2 instances for Consul. It\u0026rsquo;s recommended by the creator of Consul to stand up at least three instances of Consul. I can employee frying to apply configuration change on three running instances. However, what if I wanted AWS Autocailing to ensure there are always three instances running? Then I would need to use AMIs. This process of creating AMI as known as baking can be done manually or automatically. I knew the manual step of creating AMIs but that won\u0026rsquo;t scale if I need to make change to AMI image often. Also, it would be nice to be able to check in the change into git and have a build server bake the AMI when I check in my change.\nAminator from Netflix is a good implementation for baking AMI. My article \u0026ldquo;Baking using Aminator\u0026rdquo; describe how this is done. One thing to note is that I am incorporating frying with baking to create AMIs. It\u0026rsquo;s never either or. Aminator has a plugin machenism to apply changes using Ansible, Chef or Puppet.\n"
+},
+{
+	"uri": "/tags/",
+	"title": "Tags",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "/tags/template/",
+	"title": "Template",
+	"tags": [],
+	"description": "",
+	"content": ""
+}]

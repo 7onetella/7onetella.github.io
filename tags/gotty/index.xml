@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Gotty on DocDock Documentation</title>
+    <link>/tags/gotty/</link>
+    <description>Recent content in Gotty on DocDock Documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 07 May 2018 22:52:44 -0400</lastBuildDate>
+    
+	<atom:link href="/tags/gotty/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>The story behind docker image &#34;alpinegovim&#34;</title>
+      <link>/post/story-behind-alpinegovim/</link>
+      <pubDate>Mon, 07 May 2018 22:52:44 -0400</pubDate>
+      
+      <guid>/post/story-behind-alpinegovim/</guid>
+      <description>Motivation Many of you might think that wanting to develop remotely in docker container is bazaar. Here is why alpinegovim was created. alpinegovim is all-in-one development environment which can run in a docker container in the cloud with access to terminal as a web application.
+Beginning One day I was working for a company in NY as a consultant. Consulting agreement was signed in advance. Project manager had put in a request for the laptop I said I would need.</description>
+    </item>
+    
+  </channel>
+</rss>

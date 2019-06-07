@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Ami on DocDock Documentation</title>
+    <link>/tags/ami/</link>
+    <description>Recent content in Ami on DocDock Documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 01 May 2019 09:21:27 -0400</lastBuildDate>
+    
+	<atom:link href="/tags/ami/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Baking using Aminator</title>
+      <link>/provisioning/aminator/</link>
+      <pubDate>Wed, 01 May 2019 09:21:27 -0400</pubDate>
+      
+      <guid>/provisioning/aminator/</guid>
+      <description>Aminator workflow Aminator is a tool created by Netflix to help in baking AMIs. The Aminator workflow goes like this.
+ EBS volume gets created EBS volume gets mounted on the server running Aminator Aminator chroot to the mounted EBS volume Installs software and tools EBS volume is detached Snapshot is taken off of the EBS volume AMI is created off of the snapshot  The current Aminator documentation on github is outdated.</description>
+    </item>
+    
+    <item>
+      <title>Foundation Image</title>
+      <link>/provisioning/foundation-image/</link>
+      <pubDate>Fri, 19 Apr 2019 14:22:51 -0400</pubDate>
+      
+      <guid>/provisioning/foundation-image/</guid>
+      <description>Purpose This is my notes on creating foundation image and how I failed. I found a workaround instead. I will come back to this later on for the sake of learning more about Linux boot process.
+Building Foundation AMI  apt-get update &amp;amp;&amp;amp; apt-get install -y python python-pip python3 python3-pip  Create the volume # aws ec2 create-volume --size 8 --volume-type standard --region us-east-1 --availability-zone us-east-1a --tag-specifications &#39;ResourceType=volume,Tags=[{Key=Name,Value=foundation-vol}]&#39; { &amp;quot;AvailabilityZone&amp;quot;: &amp;quot;us-east-1a&amp;quot;, &amp;quot;Tags&amp;quot;: [ { &amp;quot;Value&amp;quot;: &amp;quot;foundation-vol&amp;quot;, &amp;quot;Key&amp;quot;: &amp;quot;Name&amp;quot; } ], &amp;quot;Encrypted&amp;quot;: false, &amp;quot;VolumeType&amp;quot;: &amp;quot;gp2&amp;quot;, &amp;quot;VolumeId&amp;quot;: &amp;quot;vol-057fc42f851326e6b&amp;quot;, &amp;quot;State&amp;quot;: &amp;quot;creating&amp;quot;, &amp;quot;Iops&amp;quot;: 100, &amp;quot;SnapshotId&amp;quot;: &amp;quot;&amp;quot;, &amp;quot;CreateTime&amp;quot;: &amp;quot;2019-04-18T15:49:25.</description>
+    </item>
+    
+  </channel>
+</rss>

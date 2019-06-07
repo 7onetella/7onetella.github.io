@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>DocDock Documentation</title>
+    
+      <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="revised" content="2019-05-21T17:40:16 EDT">
+<title>Demo :: DocDock Documentation</title>
+<link rel="shortcut icon" href="/images/favicon.png" type="image/x-icon" />
+<link href="/css/font-awesome.min.css" rel="stylesheet">
+<link href="/css/nucleus.css" rel="stylesheet">
+<link href="/theme-flex/style.css" rel="stylesheet">
+
+<link rel="stylesheet" href="/css/bootstrap.min.css">
+<script src="/js/jquery-2.x.min.js"></script>
+<script type="text/javascript">
+      var baseurl = "\/";
+</script>
+<link rel="stylesheet" href="/css/custom.css">
+
+    
+  </head>
+  <body data-url="/demo/">
+    
+      <header>
+  <div class="logo">
+    
+	
+  
+    <p>7onetella</p>
+
+  
+
+
+  </div>
+  <div class="burger"><a href="javascript:void(0);" style="font-size:15px;">&#9776;</a></div>
+    <nav class="shortcuts">
+            <li class="" role="">
+                <a href="https://github.com/7onetella"  rel="noopener">
+                  <i class='fa fa-github'></i> <label>Github repo</label>
+                </a>
+            </li>
+    </nav>
+</header>
+<article>
+  <aside>
+    <ul class="menu">
+    <li data-nav-id="/provisioning/" class="dd-item haschildren
+        ">
+      <div>
+      <a href="/provisioning/"><i class='fa fa-cloud-upload'></i>&nbsp;Provisioning</a><i class="fa fa-angle-right fa-lg category-icon"></i><i class="fa fa-circle-thin read-icon"></i>
+      </div>
+        <ul>
+      <li data-nav-id="/provisioning/aminator/" class="dd-item">
+        <div>
+          <a href="/provisioning/aminator/">
+            Baking using Aminator
+          </a><i class="fa fa-circle-thin read-icon"></i>
+        </div>
+    </li>
+      <li data-nav-id="/provisioning/foundation-image/" class="dd-item">
+        <div>
+          <a href="/provisioning/foundation-image/">
+            Foundation Image
+          </a><i class="fa fa-circle-thin read-icon"></i>
+        </div>
+    </li>
+      <li data-nav-id="/provisioning/cloudformation-template/" class="dd-item">
+        <div>
+          <a href="/provisioning/cloudformation-template/">
+            AWS CloudFormation Template
+          </a><i class="fa fa-circle-thin read-icon"></i>
+        </div>
+    </li>
+      <li data-nav-id="/provisioning/_header/" class="dd-item">
+        <div>
+          <a href="/provisioning/_header/">
+            
+          </a><i class="fa fa-circle-thin read-icon"></i>
+        </div>
+    </li>
+        </ul>
+    </li>
+    <li data-nav-id="/demo/" class="dd-item parent active alwaysopen haschildren
+        ">
+      <div>
+      <a href="/demo/"><i class='fa fa-tv'></i>&nbsp;Demo</a>
+            <i class="fa fa-angle-down fa-lg category-icon"></i><i class="fa fa-circle-thin read-icon"></i>
+      </div>
+        <ul>
+      <li data-nav-id="/demo/_header/" class="dd-item">
+        <div>
+          <a href="/demo/_header/">
+            
+          </a><i class="fa fa-circle-thin read-icon"></i>
+        </div>
+    </li>
+        </ul>
+    </li>
+
+
+
+
+    </ul>
+    <section>
+    </section>
+  </aside>
+  <section class="page">
+    
+    <div class="nav-select">
+      <center>Navigation : 
+        <select onchange="javascript:location.href = this.value;">
+          
+    <option value="/provisioning/" >
+   Provisioning</option>
+    <option value="/demo/"  selected>
+   Demo</option> 
+      <option value="/demo/_header/" >- </option>
+  
+
+
+
+        </select>
+      </center>
+    </div>
+      <div>
+        <div class="searchbox">
+          <input data-search-input id="search-by" type="text" placeholder="Search...">
+        </div>
+        <script type="text/javascript" src="/js/lunr.min.js"></script>
+        <script type="text/javascript" src="/js/auto-complete.js"></script>
+        <link href="/css/auto-complete.css" rel="stylesheet">
+        <script type="text/javascript">
+          
+              var baseurl = "\/";
+          
+        </script>
+        <script type="text/javascript" src="/js/search.js"></script>
+      </div>
+    
+
+    <h1>Demo</h1>
+    
+    
+    
+
+
+
+<h1 id="cloud-in-45-minutes-instead-of-7-days">Cloud in 45 minutes instead of 7 days</h1>
+
+<hr />
+
+<p>It would be interesting to do a project where it demos things that are mentioned in my blog posts.</p>
+
+<p>Let&rsquo;s follow this imaginary senario where there is an urgent need to deploy to cloud in 7 days.</p>
+
+<iframe width="800" height="450" src="https://www.powtoon.com/embed/cjeLdPP4rWd/" frameborder="0"></iframe>
+
+<div class="notices note" ><p><strong>Did we say 7 days? That&rsquo;s too long. We will do all of this in 45 minutes or less. I am going to assume you have your AWS setup with a VPC.</strong></p>
+</div>
+
+
+<h2 id="automate-using-ansible-scripts">Automate using Ansible scripts</h2>
+
+<p>Prerequisite for using Ansible is that you need python and pip installed. Let&rsquo;s go ahead and install them on your local machine.</p>
+
+<pre><code>apt-get install python2.7
+apt-get install python-pip
+pip install ansible
+</code></pre>
+
+<p>Let&rsquo;s check out my Ansible playbooks</p>
+
+<pre><code>git clone https://github.com/7onetella/playbooks.git
+cd playbooks
+</code></pre>
+
+<p>Make sure we have a <em>hosts</em> file like so in the playbooks folder</p>
+
+<pre><code>[remote-server]
+172.31.X.X ansible_connection=ssh  ansible_port=22  ansible_user=ubuntu  ansible_private_key_file=~/.aws/7onetella.pem
+</code></pre>
+
+<p>I personally like Debian distro like Ubuntu. Let&rsquo;s start one and install Ansible required packages. Run the following in your local machine.</p>
+
+<pre><code>export AWS_ACCESS_KEY_ID=&lt;YOUR_ACCESS_KEY_ID&gt;
+export AWS_SECRET_ACCESS_KEY=&lt;YOUR_SECRET_ACCESS_KEY&gt;
+history -c
+
+aws ec2 run-instances \
+--image-id ami-0a313d6098716f372 \
+--count 1 \
+--instance-type t2.small \
+--key-name mtv-key-pair \
+--subnet-id subnet-936c5abb \
+--associate-public-ip-address \
+--instance-initiated-shutdown-behavior terminate \
+--block-device-mappings 'DeviceName=/dev/sda1,Ebs={VolumeSize=20,DeleteOnTermination=true,VolumeType=gp2}' \
+--tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=RemoteServer}]'
+</code></pre>
+
+<div class="notices note" ><p>ami-0a313d6098716f372 is an Ubuntu 18.04 image. It didn&rsquo;t make sense to use previous versions when 18.04 is already not the latest. I had some trouble with Java 8 &amp; Java 11 but everything worked out fine.</p>
+</div>
+
+
+<pre><code>ansible -i hosts remote-server --become -m raw -a &quot;apt-get -y install python2.7&quot; \
+&amp;&amp; ansible -i hosts remote-server --become -m raw -a &quot;apt-get update&quot; \
+&amp;&amp; ansible -i hosts remote-server --become -m raw -a &quot;apt-get -y install python-pip&quot; \
+&amp;&amp; ansible -i hosts remote-server --become -m raw -a &quot;pip install ansible&quot;
+</code></pre>
+
+<p><br></p>
+
+<h3 id="let-s-install-a-bunch-in-one-go-ldap-jenkins-graphite-grafana-and-aminator">Let&rsquo;s install a bunch in one go - ldap, jenkins, graphite, grafana and aminator</h3>
+
+<hr />
+
+<pre><code>ansible-playbook -i hosts --extra-vars &quot;target=remote-server user=ubuntu&quot; apacheds.yml \
+&amp;&amp; ansible-playbook -i hosts --extra-vars &quot;target=remote-server&quot; jenkins.yml \
+&amp;&amp; ansible-playbook -i hosts --extra-vars &quot;target=remote-server user=ubuntu&quot; graphite.yml \
+&amp;&amp; ansible-playbook -i hosts --extra-vars &quot;target=remote-server user=ubuntu&quot; grafana.yml \
+&amp;&amp; ansible-playbook -i hosts --extra-vars &quot;target=remote-server playbook_user=jenkins&quot; aminator.yml
+</code></pre>
+
+<p><div class="notices note" ><p>Don&rsquo;t get me wrong. I could have used docker for all these systems. I have used docker before on apps like Jenkins. I prefer <em>fyring</em> for stateful machines such as Jenkins, LDAP, Graphite and Grafana.</p>
+</div>
+
+<br></p>
+
+<h3 id="time-to-deploy-our-app-no-not-yet">Time to deploy our app? No, not yet!</h3>
+
+<hr />
+
+<p>All of these following tasks are necessary to get our app deployed with dynamic routing. You may think that all this baking and frying is a bit much but the payoff is at the end. I have used ELB and ALB for many years. I am seeking two benefits from this work.</p>
+
+<p><strong>Dynamic Routing</strong> - Working with ECS has been great but it takes deployment of two ALBs to for me to do Blue Greeen deployment or mucking around with Listner Rule Priority. I would like to do Canary deployment as well. I feel like deployment is in dev&rsquo;s control when dynamic router like Fabio is used. Fabio can be easily updated whereas ALB requires a bit more work.</p>
+
+<p><strong>Cloud agonostic service registry</strong> - AWS™ offers SRV record based service registy with Fargate ant whatnot. I think HashCorp™, Consul is really neat and easily portable between cloud service providers. Referring to logical names in Consul&rsquo;s DNS service is much to be explored. A service tied to ALB must know the target physical end point names. That can make configuration and service deployment harder.</p>
+
+<p>so shall we do some baking?</p>
+
+<p><br></p>
+
+<h3 id="foundation-ami">Foundation AMI</h3>
+
+<hr />
+
+<p>Foundation AMI isn&rsquo;t much. It&rsquo;s a pristine version of Ubuntu with couple of useful packages. We will be using Foundation AMI when creating base AMI. All of our stateful machine images will be based off of base AMI.</p>
+
+<p>Foundation AMI will have the following minimal packages installed.</p>
+
+<ul>
+<li>python</li>
+<li>pip</li>
+<li>ansible</li>
+</ul>
+
+<div class="notices note" ><p>Here, I am going to cheat by manually installing these packages in a <strong>chrooted</strong> environment. chrooting is awesome for baking images in a very clean manner. No traces of logs to clean. No files are initialized to identify the name of machine etc. My blog post &ldquo;Baking using Aminator&rdquo; is exactly what this is. It&rsquo;s just that all the manual setup steps for Aminator has been automated by my Ansible playbook.</p>
+</div>
+
+
+<p>let&rsquo;s ssh into <em>remote-server</em> and run the following.</p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo su - root
+
+<span style="color:#111">export</span> <span style="color:#111">AWS_ACCESS_KEY_ID</span><span style="color:#f92672">=</span>&lt;YOUR_ACCESS_KEY_ID&gt;
+<span style="color:#111">export</span> <span style="color:#111">AWS_SECRET_ACCESS_KEY</span><span style="color:#f92672">=</span>&lt;YOUR_SECRET_ACCESS_KEY&gt;
+<span style="color:#111">history</span> -c
+
+aminate -n foundation_ubuntu -B ami-0a313d6098716f372 <span style="color:#8045ff">\
+</span><span style="color:#8045ff"></span>--enhanced-networking <span style="color:#8045ff">\
+</span><span style="color:#8045ff"></span>--ena-networking <span style="color:#8045ff">\
+</span><span style="color:#8045ff"></span>--arch x86_64 <span style="color:#8045ff">\
+</span><span style="color:#8045ff"></span>--provisioner-ebs-type gp2 <span style="color:#8045ff">\
+</span><span style="color:#8045ff"></span>--register-ebs-type gp2 <span style="color:#8045ff">\
+</span><span style="color:#8045ff"></span>--vm-type hvm <span style="color:#8045ff">\
+</span><span style="color:#8045ff"></span>--partition <span style="color:#ae81ff">1</span> <span style="color:#8045ff">\
+</span><span style="color:#8045ff"></span>-e ec2_apt_linux <span style="color:#8045ff">\
+</span><span style="color:#8045ff"></span>-i <span style="color:#8045ff">\
+</span><span style="color:#8045ff"></span>python
+
+<span style="color:#ae81ff">2019</span>-04-23 <span style="color:#ae81ff">15</span>:58:53 <span style="color:#f92672">[</span>INFO<span style="color:#f92672">]</span> Aminator <span style="color:#ae81ff">2</span>.2.1.dev default configuration loaded
+<span style="color:#ae81ff">2019</span>-04-23 <span style="color:#ae81ff">15</span>:58:53 <span style="color:#f92672">[</span>INFO<span style="color:#f92672">]</span> Detailed aminator output to /var/log/aminator/python-edhcux-201904231558.log
+<span style="color:#ae81ff">2019</span>-04-23 <span style="color:#ae81ff">15</span>:58:53 <span style="color:#f92672">[</span>INFO<span style="color:#f92672">]</span> Beginning amination! Package: python
+<span style="color:#ae81ff">2019</span>-04-23 <span style="color:#ae81ff">15</span>:58:53 <span style="color:#f92672">[</span>INFO<span style="color:#f92672">]</span> Connecting to EC2
+<span style="color:#ae81ff">2019</span>-04-23 <span style="color:#ae81ff">15</span>:58:53 <span style="color:#f92672">[</span>INFO<span style="color:#f92672">]</span> Aminating in region us-east-1
+<span style="color:#ae81ff">2019</span>-04-23 <span style="color:#ae81ff">15</span>:58:53 <span style="color:#f92672">[</span>INFO<span style="color:#f92672">]</span> Resolving base AMI
+<span style="color:#ae81ff">2019</span>-04-23 <span style="color:#ae81ff">15</span>:58:53 <span style="color:#f92672">[</span>INFO<span style="color:#f92672">]</span> loading cached ami details <span style="color:#00a8c8">for</span> ami-0a313d6098716f372
+<span style="color:#ae81ff">2019</span>-04-23 <span style="color:#ae81ff">15</span>:58:53 <span style="color:#f92672">[</span>INFO<span style="color:#f92672">]</span> Successfully resolved ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-20190212.1<span style="color:#f92672">(</span>ami-0a313d6098716f372<span style="color:#f92672">)</span>
+<span style="color:#ae81ff">2019</span>-04-23 <span style="color:#ae81ff">15</span>:58:54 <span style="color:#f92672">[</span>INFO<span style="color:#f92672">]</span> Searching <span style="color:#00a8c8">for</span> an available block device
+<span style="color:#ae81ff">2019</span>-04-23 <span style="color:#ae81ff">15</span>:58:54 <span style="color:#f92672">[</span>INFO<span style="color:#f92672">]</span> Block device /dev/xvdg allocated
+<span style="color:#ae81ff">2019</span>-04-23 <span style="color:#ae81ff">15</span>:59:05 <span style="color:#f92672">[</span>INFO<span style="color:#f92672">]</span> Checking and repairing root volume as necessary
+<span style="color:#ae81ff">2019</span>-04-23 <span style="color:#ae81ff">15</span>:59:05 <span style="color:#f92672">[</span>INFO<span style="color:#f92672">]</span> Attempting to resize root fs to fill volume
+<span style="color:#ae81ff">2019</span>-04-23 <span style="color:#ae81ff">15</span>:59:05 <span style="color:#f92672">[</span>INFO<span style="color:#f92672">]</span> Growing partition <span style="color:#00a8c8">if</span> necessary
+<span style="color:#ae81ff">2019</span>-04-23 <span style="color:#ae81ff">15</span>:59:06 <span style="color:#f92672">[</span>INFO<span style="color:#f92672">]</span> performing a repo install of python
+
+root#                            &lt;<span style="color:#f92672">====</span> you are dropped into chrooted terminal 
+
+root# apt-get install python-pip &lt;<span style="color:#f92672">====</span> install pip
+
+root# pip install ansible        &lt;<span style="color:#f92672">====</span> install ansible
+
+root# <span style="color:#111">exit</span>                       &lt;<span style="color:#f92672">====</span> <span style="color:#111">exit</span> to get out of chroot terminal session
+
+....
+
+<span style="color:#ae81ff">2019</span>-04-23 <span style="color:#ae81ff">17</span>:41:56 <span style="color:#f92672">[</span>INFO<span style="color:#f92672">]</span> Provisioning succeeded!
+
+....</code></pre></div>
+<p>So that&rsquo;s our Foundation AMI ~!
+<br>
+<div class="notices note" ><p>Make sure to grab the generated foundation AMI ID from the consol output. It&rsquo;s toward the end of the consol output. We will this AMI ID at the next step.</p>
+</div>
+
+<br></p>
+
+<h3 id="base-ami">Base AMI</h3>
+
+<hr />
+
+<p>Okay, we need a bit more baking before deploying Consul for service registry, Fabio for dynamic route registration, so hang in there!</p>
+
+<p>Base AMI will include</p>
+
+<ul>
+<li>aws cli</li>
+<li>boto</li>
+<li>git-core</li>
+<li>less</li>
+<li>sudo</li>
+<li>sysstat</li>
+<li>unzip</li>
+<li>zip</li>
+</ul>
+
+<p>On the <em>remote-server</em> execute the following</p>
+
+<pre><code>sudo su - root
+
+export AWS_ACCESS_KEY_ID=&lt;YOUR_ACCESS_KEY_ID&gt;
+export AWS_SECRET_ACCESS_KEY=&lt;YOUR_SECRET_ACCESS_KEY&gt;
+history -c
+
+cd /var/playbooks
+
+export FOUNDATION_AMI_ID=&lt;AMI ID from previous step&gt;
+
+sudo -E aminate -n base_ubuntu -e ec2_ansible_linux -B ${FOUNDATION_AMI_ID} \
+--enhanced-networking \
+--ena-networking \
+--arch x86_64 \
+--provisioner-ebs-type gp2 \
+--register-ebs-type gp2 \
+--vm-type hvm \
+--partition 1 \
+base-ami-ubuntu.yml
+</code></pre>
+
+<p><br></p>
+
+<h3 id="appliation-ami-consul-and-fabio">Appliation AMI - Consul and Fabio</h3>
+
+<hr />
+
+<p>Let&rsquo;s bake image for Consul and deploy and repeat the same for Fabio.</p>
+
+<h4 id="consul-baking">Consul - baking</h4>
+
+<p>On the <em>remote-server</em> execute the following</p>
+
+<pre><code>export AWS_ACCESS_KEY_ID=&lt;YOUR_ACCESS_KEY_ID&gt;
+export AWS_SECRET_ACCESS_KEY=&lt;YOUR_SECRET_ACCESS_KEY&gt;
+history -c
+
+cd /var/playbooks
+
+export BASE_AMI=&lt;Base AMI ID from previous step&gt;
+
+sudo -E aminate -n consul-cluster -e ec2_ansible_linux -B ${BASE_AMI} --extra-vars &quot;ansible_distribution=Ubuntu&quot; \
+--enhanced-networking \
+--ena-networking \
+--arch x86_64 \
+--provisioner-ebs-type gp2 \
+--register-ebs-type gp2 \
+--vm-type hvm \
+--partition 1 \
+consul-cluster.yml
+</code></pre>
+
+<h4 id="consul-launching">Consul - launching</h4>
+
+<p>Grab the AMI ID from consol output and use it in the following command to finally launch <strong>Consol</strong>. It&rsquo;s recommended to use min of three instances for redundancy.</p>
+
+<pre><code>aws ec2 run-instances \
+--image-id &lt;CONSUL_AMI_ID&gt; \
+--count 3 \
+--instance-type t2.medium \
+--key-name mtv-key-pair \
+--subnet-id subnet-936c5abb \
+--associate-public-ip-address \
+--instance-initiated-shutdown-behavior terminate \
+--block-device-mappings 'DeviceName=/dev/sda1,Ebs={VolumeSize=20,DeleteOnTermination=true,VolumeType=gp2}' \
+--tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=Consul}]'
+</code></pre>
+
+<p>Create three A records in Route 53</p>
+
+<ul>
+<li>consul.example.com A 172.31.41.168</li>
+<li>consul.example.com A 172.31.37.149</li>
+<li>consul.example.com A 172.31.38.198</li>
+</ul>
+
+<p><strong>Attach IAM Role</strong></p>
+
+<p>Create a role called EC2ReadOnly with ec2:DescribeInstances permission and attach it to the three Consul ec2 instances.
+Our Consul instances will discover each other by calling &ldquo;DescribeInstances&rdquo; on ec2 instances before forming a cluster.</p>
+
+<p>You can hit the Consul UI here =&gt; <a href="http://consul.example.com:8500/ui">http://consul.example.com:8500/ui</a>
+<br></p>
+
+<h4 id="fabio-baking">Fabio - baking</h4>
+
+<p>base ami: ami-022fcccf8bf7d91b5</p>
+
+<pre><code>export AWS_ACCESS_KEY_ID=&lt;YOUR_ACCESS_KEY_ID&gt;
+export AWS_SECRET_ACCESS_KEY=&lt;YOUR_SECRET_ACCESS_KEY&gt;
+history -c
+
+cd /var/playbooks
+
+export BASE_AMI=&lt;Base AMI ID&gt;
+
+sudo -E aminate -n fabio -e ec2_ansible_linux -B ${BASE_AMI} --extra-vars &quot;target=all consul_cluster_hostname=consul.example.com&quot; \
+--enhanced-networking \
+--ena-networking \
+--arch x86_64 \
+--provisioner-ebs-type gp2 \
+--register-ebs-type gp2 \
+--vm-type hvm \
+--partition 1 \
+fabio.yml
+</code></pre>
+
+<h4 id="fabio-launching">Fabio - launching</h4>
+
+<p>Grab the AMI ID from consol output and use it in the following command to launch <strong>Fabio</strong>.</p>
+
+<pre><code>aws ec2 run-instances \
+--image-id &lt;FABIO_AMI_ID&gt; \
+--count 1 \
+--instance-type t2.medium \
+--key-name mtv-key-pair \
+--subnet-id subnet-936c5abb \
+--associate-public-ip-address \
+--instance-initiated-shutdown-behavior terminate \
+--block-device-mappings 'DeviceName=/dev/sda1,Ebs={VolumeSize=20,DeleteOnTermination=true,VolumeType=gp2}' \
+--tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=FabioLB}]'
+</code></pre>
+
+<p>Create one A records in Route 53</p>
+
+<ul>
+<li>fabio.example.com A 172.31.41.100
+<br>
+<br></li>
+</ul>
+
+<h3 id="create-ecs-base-ami">Create ECS Base AMI</h3>
+
+<hr />
+
+<p>We are getting very close to deploying our app. Our app will be deployed as ECS service. The app wil register itself with Consul as it comes up. It will deregister when it goes down.
+Fabio will pick up the route host/path info from Consul in the form of tags.</p>
+
+<div class="notices note" ><p>I hate to disappoint anyone but I am cheating here again instead of full automation. We are building another foundation/base AMI for ECS. This AMI will be combination of a foundation &amp; a base image.
+Lasiness always prevails. Don&rsquo;t judge me.</p>
+</div>
+
+
+<pre><code>sudo su - root
+
+export AWS_ACCESS_KEY_ID=AKIAI3C4HGAAX2AOVXDA
+export AWS_SECRET_ACCESS_KEY=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
+export base_ami=ami-00cf4737e238866a3
+history -c
+
+sudo -E aminate -n base_ecs -B ${base_ami} \
+--enhanced-networking \
+--ena-networking \
+--arch x86_64 \
+--provisioner-ebs-type gp2 \
+--register-ebs-type gp2 \
+--vm-type hvm \
+--partition 1 \
+-i \
+python
+
+$ &lt;=== You are dropped into chrooted terminal, interactive mode. Excute the following. 
+
+yum install -y git \
+&amp;&amp; git clone https://github.com/7onetella/playbooks.git \
+&amp;&amp; cd playbooks \
+&amp;&amp; yum install -y python-pip \
+&amp;&amp; pip install ansible \
+&amp;&amp; ansible-playbook --extra-vars &quot;consul_cluster_hostname=consul.example.com&quot; consul-agent-local.yml \
+&amp;&amp; exit
+</code></pre>
+
+<p>BTW, <strong>ami-00cf4737e238866a3</strong>. This AMI is the official ECS Optimized AMI ID for us-east-1 region.</p>
+
+<p>We will use the output AMI ID in EC2 Launch Configuration to launch multiple EC2 instances for running our apps. There are many YouTube videos on how to create Launch Configration, so I will skip this step.
+<br></p>
+
+<p>If you go to Consul UI now, you should see something similar to the following except the helloworld app. We will deploy our apps shortly.
+<img src="/images/consul.png" alt="Consul" /></p>
+
+<h3 id="everthing-else-that-s-been-deployed-so-far">Everthing else that&rsquo;s been deployed so far</h3>
+
+<hr />
+
+<p><strong>LDAP</strong> - You can use any ldap client to log in and take a look. I am using Apache Directory Studio.
+<img src="/images/ldap.png" alt="ldap directory" /></p>
+
+<div class="notices note" ><p>ApacheDS LDAP server is running on port 10389<br>
+Bind DN:  uid=admin,ou=system<br />
+Bind Password: secret<br>
+Regular User: doej<br>
+Reg. User Password: foo<br>
+Reg User Groups: developers and managers</p>
+</div>
+
+
+<hr />
+
+<p><strong>Jenkins</strong> - We will use Jenkins for what it does best.</p>
+
+<p>You can optionally go to Jekins <a href="http://localhost:8080/configureSecurity/">Global Security Page</a> and set up Jenkins to use the LDAP for authentication.</p>
+
+<p>Here is the text config for easy copy and paste</p>
+
+<pre><code># Server: localhost:10389
+# root DN:
+# User search base: dc=example,dc=com
+#	User search filter: uid={0}
+# Group search base: ou=groups,dc=example,dc=com
+# Group search filter: (objectclass=groupOfUniqueNames)
+# Group membership &gt; Search for LDAP groups containing user &gt; Group membership filter: 
+# Manager DN: uid=admin,ou=system
+# Manager Password: secret
+# Display Name LDAP attribute: cn
+# Email Address LDAP attribute: mail
+</code></pre>
+
+<p><img src="/images/jenkins_ldap_success.png" alt="ldap directory" /></p>
+
+<div class="notices note" ><p>user: admin<br>
+password: password</p>
+</div>
+
+
+<hr />
+
+<p><strong>Graphite</strong> - will be used to capture metrics data. LDAP user doej and the password works here.</p>
+
+<p>Login page is <a href="http://remote-server/account/login">http://remote-server/account/login</a>
+<img src="/images/graphite_login.png" alt="Graphite login" />
+<div class="notices note" ><p>user: admin<br>
+password: password</p>
+</div>
+</p>
+
+<hr />
+
+<p><strong>Grafana</strong> - is really awesome apps for curating graphs. LDAP user doej and the password works here.</p>
+
+<p>Login page is <a href="http://remote-server:3000/login">http://remote-server:3000/login</a>
+<img src="/images/grafana_login.png" alt="Grafana login" />
+<div class="notices note" ><p>user: admin<br>
+password: password</p>
+</div>
+</p>
+
+<hr />
+
+<p><strong>Humanoid</strong> - is our Slack App. This hasn&rsquo;t been deployed yet. We will use Humanoid to do app deployment, LDAP user management, and release.</p>
+
+<p>Execute the following from your <strong>local</strong> machine to deploy humanoid</p>
+
+<pre><code>ansible-playbook -i hosts \
+--extra-vars &quot;target=remote-server bot_access_token=&lt;YOUR_BOT_ACCESS_TOEKN&gt; bot_member_id=&lt;YOUR_BOT_MEMBER_ID&gt;&quot; \
+humanoid.yml
+</code></pre>
+
+<p><img src="/images/slack_morgan.png?classes=shadow" alt="Humanoid" />
+<br></p>
+
+<h3 id="let-s-deploy-our-app">Let&rsquo;s deploy our app!</h3>
+
+<hr />
+
+<p>Network topology for our app looks like this.</p>
+
+<link href="/mermaid/mermaid.css" type="text/css" rel="stylesheet"/>
+<script defer src="/mermaid/mermaid.js">mermaid.initialize({startOnLoad:true});</script>
+<div class="mermaid" align="left" >
+graph LR;
+    subgraph VPC
+        Consul
+        Fabio
+        OurApp
+    end
+    Developers -.- Fabio
+    Fabio -.- Consul
+    Fabio -.- OurApp
+    OurApp -.- Consul
+</div>
+
+
+
+    
+    
+        <div class="chevrons">
+    <div id="navigation">
+<a class="nav nav-prev" href="/provisioning/_header/" title=""> <i class="fa fa-chevron-left"></i><label></label></a>
+    <a class="nav nav-next" href="/demo/_header/" title="" style="margin-right: 0px;"><label></label><i class="fa fa-chevron-right"></i></a></div>
+  </div>
+
+  </section>
+</article>
+
+<footer>
+
+<div class="footline">
+    
+
+    
+
+    
+
+    
+    <div class="github-link">
+      <a href="https://github.com/vjeantet/hugo-theme-docdock/edit/master/exampleSite/content/demo/_index.md" target="blank"><i class="fa fa-code-fork"></i>
+        Improve this page</a>
+    </div>
+    
+  </div>
+
+
+	<div>
+
+
+  
+    <hr />
+
+<p>references font awesome icons <a href="https://fontawesome.com/v4.7.0/icons/">https://fontawesome.com/v4.7.0/icons/</a></p>
+
+  
+
+
+
+	</div>
+</footer>
+
+<script src="/js/clipboard.min.js"></script>
+
+<link href="/css/featherlight.min.css" rel="stylesheet">
+<script src="/js/featherlight.min.js"></script>
+
+
+
+<script src="/theme-flex/script.js"></script>
+
+
+    
+
+    
+    
+
+    
+  </body>
+</html>

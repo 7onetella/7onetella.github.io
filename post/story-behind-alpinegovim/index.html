@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>DocDock Documentation</title>
+    
+      <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="revised" content="2019-04-23T14:14:02 EDT">
+<title>The story behind docker image &#34;alpinegovim&#34; :: DocDock Documentation</title>
+<link rel="shortcut icon" href="/images/favicon.png" type="image/x-icon" />
+<link href="/css/font-awesome.min.css" rel="stylesheet">
+<link href="/css/nucleus.css" rel="stylesheet">
+<link href="/theme-flex/style.css" rel="stylesheet">
+
+<link rel="stylesheet" href="/css/bootstrap.min.css">
+<script src="/js/jquery-2.x.min.js"></script>
+<script type="text/javascript">
+      var baseurl = "\/";
+</script>
+<meta name="description" content="">
+
+
+
+    
+  </head>
+  <body data-url="/post/story-behind-alpinegovim/">
+    
+      <header>
+  <div class="logo">
+    
+	
+  
+    <p>7onetella</p>
+
+  
+
+
+  </div>
+  <div class="burger"><a href="javascript:void(0);" style="font-size:15px;">&#9776;</a></div>
+    <nav class="shortcuts">
+            <li class="" role="">
+                <a href="https://github.com/7onetella"  rel="noopener">
+                  <i class='fa fa-github'></i> <label>Github repo</label>
+                </a>
+            </li>
+    </nav>
+</header>
+<article>
+  <aside>
+    <ul class="menu">
+          <li data-nav-id="/" class="dd-item">
+          <a href="/">
+            <i class="fa fa-fw fa-home"></i>
+          </a>
+          </li>
+    <li data-nav-id="/provisioning/" class="dd-item haschildren
+        ">
+      <div>
+      <a href="/provisioning/"><i class='fa fa-cloud-upload'></i>&nbsp;Provisioning</a><i class="fa fa-angle-right fa-lg category-icon"></i><i class="fa fa-circle-thin read-icon"></i>
+      </div>
+        <ul>
+      <li data-nav-id="/provisioning/baking/" class="dd-item">
+        <div>
+          <a href="/provisioning/baking/">
+            Creating AMI using Netflix Aminator
+          </a><i class="fa fa-circle-thin read-icon"></i>
+        </div>
+    </li>
+      <li data-nav-id="/provisioning/foundation-image/" class="dd-item">
+        <div>
+          <a href="/provisioning/foundation-image/">
+            Creating foundation image
+          </a><i class="fa fa-circle-thin read-icon"></i>
+        </div>
+    </li>
+      <li data-nav-id="/provisioning/cloudformation-template/" class="dd-item">
+        <div>
+          <a href="/provisioning/cloudformation-template/">
+            How to better manage your ECS services in AWS cloud
+          </a><i class="fa fa-circle-thin read-icon"></i>
+        </div>
+    </li>
+      <li data-nav-id="/provisioning/_header/" class="dd-item">
+        <div>
+          <a href="/provisioning/_header/">
+            
+          </a><i class="fa fa-circle-thin read-icon"></i>
+        </div>
+    </li>
+        </ul>
+    </li>
+    <li data-nav-id="/post/" class="dd-item parent haschildren
+        ">
+      <div>
+      <a href="/post/"><i class='fa fa-commenting'></i>&nbsp;Docker</a>
+            <i class="fa fa-angle-down fa-lg category-icon"></i><i class="fa fa-circle-thin read-icon"></i>
+      </div>
+        <ul>
+      <li data-nav-id="/post/story-behind-alpinegovim/" class="dd-item active">
+        <div>
+          <a href="/post/story-behind-alpinegovim/">
+            The story behind docker image &#34;alpinegovim&#34;
+          </a><i class="fa fa-circle-thin read-icon"></i>
+        </div>
+    </li>
+      <li data-nav-id="/post/_header/" class="dd-item">
+        <div>
+          <a href="/post/_header/">
+            
+          </a><i class="fa fa-circle-thin read-icon"></i>
+        </div>
+    </li>
+        </ul>
+    </li>
+
+
+
+
+    </ul>
+    <section>
+    </section>
+  </aside>
+  <section class="page">
+    
+    <div class="nav-select">
+      <center>Navigation : 
+        <select onchange="javascript:location.href = this.value;">
+          
+    <option value="/provisioning/" >
+   Provisioning</option>
+    <option value="/post/" >
+   Docker</option> 
+      <option value="/post/story-behind-alpinegovim/"  selected>- The story behind docker image &#34;alpinegovim&#34;</option>
+      <option value="/post/_header/" >- </option>
+  
+
+
+
+        </select>
+      </center>
+    </div>
+      <div>
+        <div class="searchbox">
+          <input data-search-input id="search-by" type="text" placeholder="Search...">
+        </div>
+        <script type="text/javascript" src="/js/lunr.min.js"></script>
+        <script type="text/javascript" src="/js/auto-complete.js"></script>
+        <link href="/css/auto-complete.css" rel="stylesheet">
+        <script type="text/javascript">
+          
+              var baseurl = "\/";
+          
+        </script>
+        <script type="text/javascript" src="/js/search.js"></script>
+      </div>
+    
+
+    <h1>The story behind docker image &#34;alpinegovim&#34;</h1>
+    
+    
+    
+    
+
+<h3 id="motivation">Motivation</h3>
+
+<p>Many of you might think that wanting to develop remotely in docker container is bazaar. Here is why <strong><a href="https://github.com/7onetella/alpinegovim">alpinegovim</a></strong> was created. alpinegovim is all-in-one development environment which can run in a docker container in the cloud with access to terminal as a web application.</p>
+
+<h3 id="beginning">Beginning</h3>
+
+<p>One day I was working for a company in NY as a consultant. Consulting agreement was signed in advance. Project manager had put in a request for the laptop I said I would need. I would say there was at least 2 months lead time for helpdesk to procure the equipment I needed.</p>
+
+<h3 id="problem">Problem</h3>
+
+<p>It&rsquo;s the first day of work, I am told it will take about 1 month and a half to for me to get the laptop. My consulting contract was for 6 months. My predicament was that I didn&rsquo;t have all the time in the world for me to wait for the laptop and then rush to finish the project. I was given a very old laptop with under powered CPU and memory while I waited for the laptop.</p>
+
+<h3 id="solution">Solution</h3>
+
+<p>I came up with an idea to use remote server for development. I used remote desktop like software called NoMachine to remotely access a powerful server. I installed all my development tools and started my development there. The project was successfully completed on time. At this point, you might be asking which programming language would require so much CPU power and memory to develop. The client company&rsquo;s IT shop&rsquo;s choice of language was Java. If you know Java, you know Java is heavy in memory usage.</p>
+
+<h3 id="now-with-golang">Now with Golang</h3>
+
+<p>Ever since then I have discovered Go. I will do Python if required. I will do Nodejs as well. All of these three languages are light. You can simply use any text editors to develop. I would prefer to do Go if I am given the freedome to choose the language to develop in.</p>
+
+<h3 id="vim-go">Vim-go</h3>
+
+<p>If anyone has watched &ldquo;Vim-go&rdquo; YouTube <strong><a href="https://youtu.be/7BqJ8dzygtU">video</a></strong>, you know anyone can be very productive writing code in vim once you have mastered vim. Vim-go just makes writing Go code so much fun and easy.</p>
+
+<p>TODO: add a picture of vim-go</p>
+
+<h3 id="reality">Reality</h3>
+
+<p>I want to be honiest. I have NOT master vim yet. I would like to have my laguages and tools all installed and ready to go in seconds just in case if I am ever again thrown into a situation where I have no choice but to develop on a remote server. I am hoping that this might happen sometime in the future. I would be forced to do all my development on vim. That would be a fantastic way to master vim-go!</p>
+
+<h3 id="as-of-today">As of today</h3>
+
+<p>I have yet to use &ldquo;alpinegovim&rdquo; on a remote server. I am very happy with vscode. However, I have used gotty to remotely access my docker instance&rsquo;s terminal in &ldquo;web browser&rdquo; and troubleshoot. Life is good.</p>
+
+<p>TODO: add link for gotty</p>
+
+
+    
+    
+        <div class="chevrons">
+    <div id="navigation">
+<a class="nav nav-prev" href="/post/" title="Docker"> <i class="fa fa-chevron-left"></i><label>Docker</label></a>
+    <a class="nav nav-next" href="/post/_header/" title="" style="margin-right: 0px;"><label></label><i class="fa fa-chevron-right"></i></a></div>
+  </div>
+
+  </section>
+</article>
+
+<footer>
+
+<div class="footline">
+    
+    <div class="tags"> 
+      
+        <a class="label label-default" href="/tags/remote">remote</a>
+      
+        <a class="label label-default" href="/tags/development">development</a>
+      
+        <a class="label label-default" href="/tags/gotty">gotty</a>
+      
+        <a class="label label-default" href="/tags/golang">golang</a>
+      
+        <a class="label label-default" href="/tags/vim-go">vim-go</a>
+      
+    </div>
+    
+
+    
+
+    
+    <div class="date">
+        <i class='fa fa-calendar'></i> Last update on 07/05/2018
+    </div>
+    
+
+    
+    <div class="github-link">
+      <a href="https://github.com/vjeantet/hugo-theme-docdock/edit/master/exampleSite/content/post/story-behind-alpinegovim.md" target="blank"><i class="fa fa-code-fork"></i>
+        Improve this page</a>
+    </div>
+    
+  </div>
+
+
+	<div>
+
+
+  
+    <hr />
+
+<p>references font awesome icons <a href="https://fontawesome.com/v4.7.0/icons/">https://fontawesome.com/v4.7.0/icons/</a></p>
+
+  
+
+
+
+	</div>
+</footer>
+
+<script src="/js/clipboard.min.js"></script>
+
+<link href="/css/featherlight.min.css" rel="stylesheet">
+<script src="/js/featherlight.min.js"></script>
+
+
+
+<script src="/theme-flex/script.js"></script>
+
+
+    
+
+    
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Frying on DocDock Documentation</title>
+    <link>/tags/frying/</link>
+    <description>Recent content in Frying on DocDock Documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 01 May 2019 09:21:27 -0400</lastBuildDate>
+    
+	<atom:link href="/tags/frying/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Baking using Aminator</title>
+      <link>/provisioning/aminator/</link>
+      <pubDate>Wed, 01 May 2019 09:21:27 -0400</pubDate>
+      
+      <guid>/provisioning/aminator/</guid>
+      <description>Aminator workflow Aminator is a tool created by Netflix to help in baking AMIs. The Aminator workflow goes like this.
+ EBS volume gets created EBS volume gets mounted on the server running Aminator Aminator chroot to the mounted EBS volume Installs software and tools EBS volume is detached Snapshot is taken off of the EBS volume AMI is created off of the snapshot  The current Aminator documentation on github is outdated.</description>
+    </item>
+    
+  </channel>
+</rss>

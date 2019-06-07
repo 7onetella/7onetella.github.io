@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tags on DocDock Documentation</title>
+    <link>/tags/</link>
+    <description>Recent content in Tags on DocDock Documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 01 May 2019 09:21:27 -0400</lastBuildDate>
+    
+	<atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Ami</title>
+      <link>/tags/ami/</link>
+      <pubDate>Wed, 01 May 2019 09:21:27 -0400</pubDate>
+      
+      <guid>/tags/ami/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Aminator</title>
+      <link>/tags/aminator/</link>
+      <pubDate>Fri, 19 Apr 2019 14:22:51 -0400</pubDate>
+      
+      <guid>/tags/aminator/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Aws</title>
+      <link>/tags/aws/</link>
+      <pubDate>Wed, 01 May 2019 09:21:27 -0400</pubDate>
+      
+      <guid>/tags/aws/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Baking</title>
+      <link>/tags/baking/</link>
+      <pubDate>Wed, 01 May 2019 09:21:27 -0400</pubDate>
+      
+      <guid>/tags/baking/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Cloudformation</title>
+      <link>/tags/cloudformation/</link>
+      <pubDate>Tue, 08 May 2018 09:05:27 -0400</pubDate>
+      
+      <guid>/tags/cloudformation/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Devops</title>
+      <link>/tags/devops/</link>
+      <pubDate>Wed, 01 May 2019 09:21:27 -0400</pubDate>
+      
+      <guid>/tags/devops/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Frying</title>
+      <link>/tags/frying/</link>
+      <pubDate>Wed, 01 May 2019 09:21:27 -0400</pubDate>
+      
+      <guid>/tags/frying/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Howto</title>
+      <link>/tags/howto/</link>
+      <pubDate>Fri, 19 Apr 2019 14:22:51 -0400</pubDate>
+      
+      <guid>/tags/howto/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Hvm</title>
+      <link>/tags/hvm/</link>
+      <pubDate>Fri, 19 Apr 2019 14:22:51 -0400</pubDate>
+      
+      <guid>/tags/hvm/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Netflix</title>
+      <link>/tags/netflix/</link>
+      <pubDate>Fri, 19 Apr 2019 14:22:51 -0400</pubDate>
+      
+      <guid>/tags/netflix/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Ops</title>
+      <link>/tags/ops/</link>
+      <pubDate>Tue, 08 May 2018 09:05:27 -0400</pubDate>
+      
+      <guid>/tags/ops/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Template</title>
+      <link>/tags/template/</link>
+      <pubDate>Tue, 08 May 2018 09:05:27 -0400</pubDate>
+      
+      <guid>/tags/template/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>DocDock Documentation</title>
+    
+      <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="revised" content="2019-05-21T17:40:16 EDT">
+<title>Baking using Aminator :: DocDock Documentation</title>
+<link rel="shortcut icon" href="/images/favicon.png" type="image/x-icon" />
+<link href="/css/font-awesome.min.css" rel="stylesheet">
+<link href="/css/nucleus.css" rel="stylesheet">
+<link href="/theme-flex/style.css" rel="stylesheet">
+
+<link rel="stylesheet" href="/css/bootstrap.min.css">
+<script src="/js/jquery-2.x.min.js"></script>
+<script type="text/javascript">
+      var baseurl = "\/";
+</script>
+<link rel="stylesheet" href="/css/custom.css">
+
+    
+  </head>
+  <body data-url="/provisioning/aminator/">
+    
+      <header>
+  <div class="logo">
+    
+	
+  
+    <p>7onetella</p>
+
+  
+
+
+  </div>
+  <div class="burger"><a href="javascript:void(0);" style="font-size:15px;">&#9776;</a></div>
+    <nav class="shortcuts">
+            <li class="" role="">
+                <a href="https://github.com/7onetella"  rel="noopener">
+                  <i class='fa fa-github'></i> <label>Github repo</label>
+                </a>
+            </li>
+    </nav>
+</header>
+<article>
+  <aside>
+    <ul class="menu">
+    <li data-nav-id="/provisioning/" class="dd-item parent haschildren
+        ">
+      <div>
+      <a href="/provisioning/"><i class='fa fa-cloud-upload'></i>&nbsp;Provisioning</a>
+            <i class="fa fa-angle-down fa-lg category-icon"></i><i class="fa fa-circle-thin read-icon"></i>
+      </div>
+        <ul>
+      <li data-nav-id="/provisioning/aminator/" class="dd-item active">
+        <div>
+          <a href="/provisioning/aminator/">
+            Baking using Aminator
+          </a><i class="fa fa-circle-thin read-icon"></i>
+        </div>
+    </li>
+      <li data-nav-id="/provisioning/foundation-image/" class="dd-item">
+        <div>
+          <a href="/provisioning/foundation-image/">
+            Foundation Image
+          </a><i class="fa fa-circle-thin read-icon"></i>
+        </div>
+    </li>
+      <li data-nav-id="/provisioning/cloudformation-template/" class="dd-item">
+        <div>
+          <a href="/provisioning/cloudformation-template/">
+            AWS CloudFormation Template
+          </a><i class="fa fa-circle-thin read-icon"></i>
+        </div>
+    </li>
+      <li data-nav-id="/provisioning/_header/" class="dd-item">
+        <div>
+          <a href="/provisioning/_header/">
+            
+          </a><i class="fa fa-circle-thin read-icon"></i>
+        </div>
+    </li>
+        </ul>
+    </li>
+    <li data-nav-id="/demo/" class="dd-item alwaysopen haschildren
+        ">
+      <div>
+      <a href="/demo/"><i class='fa fa-tv'></i>&nbsp;Demo</a>
+            <i class="fa fa-angle-down fa-lg category-icon"></i><i class="fa fa-circle-thin read-icon"></i>
+      </div>
+        <ul>
+      <li data-nav-id="/demo/_header/" class="dd-item">
+        <div>
+          <a href="/demo/_header/">
+            
+          </a><i class="fa fa-circle-thin read-icon"></i>
+        </div>
+    </li>
+        </ul>
+    </li>
+
+
+
+
+    </ul>
+    <section>
+    </section>
+  </aside>
+  <section class="page">
+    
+    <div class="nav-select">
+      <center>Navigation : 
+        <select onchange="javascript:location.href = this.value;">
+          
+    <option value="/provisioning/" >
+   Provisioning</option> 
+      <option value="/provisioning/aminator/"  selected>- Baking using Aminator</option>
+      <option value="/provisioning/foundation-image/" >- Foundation Image</option>
+      <option value="/provisioning/cloudformation-template/" >- AWS CloudFormation Template</option>
+      <option value="/provisioning/_header/" >- </option>
+  
+    <option value="/demo/" >
+   Demo</option> 
+      <option value="/demo/_header/" >- </option>
+  
+
+
+
+        </select>
+      </center>
+    </div>
+      <div>
+        <div class="searchbox">
+          <input data-search-input id="search-by" type="text" placeholder="Search...">
+        </div>
+        <script type="text/javascript" src="/js/lunr.min.js"></script>
+        <script type="text/javascript" src="/js/auto-complete.js"></script>
+        <link href="/css/auto-complete.css" rel="stylesheet">
+        <script type="text/javascript">
+          
+              var baseurl = "\/";
+          
+        </script>
+        <script type="text/javascript" src="/js/search.js"></script>
+      </div>
+    
+
+    <h1>Baking using Aminator</h1>
+    
+    
+    
+    
+
+<h2 id="aminator-workflow">Aminator workflow</h2>
+
+<p>Aminator is a tool created by Netflix to help in baking AMIs. The Aminator workflow goes like this.</p>
+
+<ol>
+<li>EBS volume gets created</li>
+<li>EBS volume gets mounted on the server running Aminator</li>
+<li>Aminator chroot to the mounted EBS volume</li>
+<li>Installs software and tools</li>
+<li>EBS volume is detached</li>
+<li>Snapshot is taken off of the EBS volume</li>
+<li>AMI is created off of the snapshot</li>
+</ol>
+
+<p>The current Aminator documentation on github is outdated. This blog post hopes to share some knowledge on how I got Aminator to work for me.</p>
+
+<h2 id="baking-and-frying">Baking and frying</h2>
+
+<hr />
+
+<p><strong>Baking:</strong>
+One way of installing software on EC2 is <a href="https://cloudinit.readthedocs.io/en/latest/index.html">cloud-init</a>. The cloud-init script installs requisite software during bootup. However, anything can happen while downloading. If anyone is not familiar with cloud-init scripts, they are scripts specified in EC2 User Data. User Data is run during bootup.</p>
+
+<p>The much better way of achieving this is called baking. Baking means creating immutable machine images. AMI is the final output in this case. The requisite software is pre-downloaded as part of the AMI, the machine image.</p>
+
+<p>Baking is good for autoscaling and fast EC2 startup time. Frying can be used as part of baking while creating AMI.</p>
+
+<p><strong>Frying:</strong>
+generally describes using tools like Chef, Puppet, or Ansible to change the config or install software on a machine during runtime after bootup. For example, we can use Chef to rotate ssh keys, update /etc/resolver.conf, etc.</p>
+
+<h2 id="aminator-server-setup">Aminator server setup</h2>
+
+<p>I am running Aminator on Ubuntu 18. Python, pip, and Ansible are required.</p>
+
+<pre><code># apt-get install python -y
+# apt-get update &amp;&amp; sudo apt-get install python-pip -y
+# pip install ansible
+</code></pre>
+
+<p>Install my patched version of Aminator.</p>
+
+<pre><code># pip install git+https://github.com/7onetella/aminator.git#egg=aminator
+</code></pre>
+
+<p>The patch Github PR is <a href="https://github.com/Netflix/aminator/pull/273">here</a> if you want to see the patch diff.</p>
+
+<p>We use Ansible provisioner with Aminator. Install my patched version of Aminator ansible plugin.</p>
+
+<pre><code># pip install git+https://github.com/7onetella/ansible-provisioner.git#egg=aminatorplugins-ansible
+</code></pre>
+
+<p>The patch Github PR is <a href="https://github.com/aminator-plugins/ansible-provisioner/pull/19">here</a> if you want to see the patch diff.</p>
+
+<p>We need to update playbook source and destination path on <strong>/etc/aminator/plugins/aminator.plugins.provisioner.ansible.yml</strong> as the initial yml file references paths that are specific to Netflix. Source path is the path on Aminator server. Destination path is the path on the chrooted volume path.</p>
+
+<pre><code># vi /etc/aminator/plugins/aminator.plugins.provisioner.ansible.yml
+enabled: true
+
+# Location and content of local inventory file
+inventory_file_path: /etc/ansible
+inventory_file: local
+inventory_file_content: |
+  127.0.0.1
+
+# This is the path to all Ansible playbooks on the Aminator server
+# (outside the chroot environment). These will be copied to 'playbooks_path_dest'
+playbooks_path_source: /root/playbooks
+
+# The location to store playbooks on the AMI
+playbooks_path_dest: /tmp/playbooks
+
+# Set to False to delete all files in 'playbooks_path_dest' before snapshotting
+# the volume
+keep_playbooks: True
+</code></pre>
+
+<p>Then you will need to add an environment that uses the Ansible provisioner to your /etc/aminator/environments.yml file. For example:</p>
+
+<pre><code>ec2_ansible_linux:
+    cloud: ec2
+    distro: debian
+    provisioner: ansible
+    volume: linux
+    blockdevice: linux
+    finalizer: tagging_ebs
+</code></pre>
+
+<div class="alert 
+alert-success"
+ 
+role="alert">Now you are ready to use Aminator</div>
+
+
+<h2 id="creating-foundation-image">Creating Foundation Image</h2>
+
+<hr />
+
+<p>Creating a foundation AMI has not been the easiest. I deviated from Aminiator WIKI page on how to create foundation AMI. You can see my failed attempt <a href="/provisioning/foundation-image/">here</a>. For now using Ubuntu 18 AMI from &ldquo;Quick Start&rdquo; page seems to be good enough.</p>
+
+<p>Foundation image only needs Ansible so python and pip get installed as prerequisite.</p>
+
+<p>We need AWS credential OR EC2 instance with IAM role that has rights to create EBS, mount volume, take snapshot, create AMI, etc.</p>
+
+<p>I chose to use AWS credential</p>
+
+<pre><code>export AWS_ACCESS_KEY_ID=&lt;YOUR ACCESS KEY ID&gt;
+export AWS_SECRET_ACCESS_KEY=&lt;YOUR SECRET ACCESS KEY ID&gt;
+</code></pre>
+
+<p>Aminator input parameters</p>
+
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th align="center">Note</th>
+<th align="right">Possible Values</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>&ndash;vm-type</td>
+<td align="center">paravirtual has known CVE</td>
+<td align="right">hvm or paravirtual</td>
+</tr>
+
+<tr>
+<td>-e</td>
+<td align="center">environments</td>
+<td align="right"><a href="https://github.com/7onetella/aminator/blob/master/aminator/default_conf/environments.yml">here</a></td>
+</tr>
+
+<tr>
+<td>-partition</td>
+<td align="center">disk partition. it&rsquo;s required for hvm</td>
+<td align="right">1 ~ n</td>
+</tr>
+
+<tr>
+<td>-B</td>
+<td align="center">base AMI ID</td>
+<td align="right">ami-0a313d6098716f372 is the current Ubuntu 18 AMD64 AMI</td>
+</tr>
+
+<tr>
+<td>-i</td>
+<td align="center">enables interactive mode</td>
+<td align="right"></td>
+</tr>
+</tbody>
+</table>
+
+<p>Run aminate -h to get help on list of parameters if you like.</p>
+
+<div class="notices note" ><p>Aminator execution only allows installing one software artifact which is python in our example. However we still need pip and ansible installed so we use interactive mode to cheat and install them manually.</p>
+</div>
+
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">root# aminate -n foundation -B ami-0a313d6098716f372 <span style="color:#8045ff">\
+</span><span style="color:#8045ff"></span>--enhanced-networking <span style="color:#8045ff">\
+</span><span style="color:#8045ff"></span>--ena-networking <span style="color:#8045ff">\
+</span><span style="color:#8045ff"></span>--arch x86_64 <span style="color:#8045ff">\
+</span><span style="color:#8045ff"></span>--provisioner-ebs-type gp2 <span style="color:#8045ff">\
+</span><span style="color:#8045ff"></span>--register-ebs-type gp2 <span style="color:#8045ff">\
+</span><span style="color:#8045ff"></span>--vm-type hvm <span style="color:#8045ff">\
+</span><span style="color:#8045ff"></span>--partition <span style="color:#ae81ff">1</span> <span style="color:#8045ff">\
+</span><span style="color:#8045ff"></span>-e ec2_apt_linux <span style="color:#8045ff">\
+</span><span style="color:#8045ff"></span>-i <span style="color:#8045ff">\
+</span><span style="color:#8045ff"></span>python
+
+<span style="color:#ae81ff">2019</span>-04-23 <span style="color:#ae81ff">15</span>:58:53 <span style="color:#f92672">[</span>INFO<span style="color:#f92672">]</span> Aminator <span style="color:#ae81ff">2</span>.2.1.dev default configuration loaded
+<span style="color:#ae81ff">2019</span>-04-23 <span style="color:#ae81ff">15</span>:58:53 <span style="color:#f92672">[</span>INFO<span style="color:#f92672">]</span> Detailed aminator output to /var/log/aminator/python-edhcux-201904231558.log
+<span style="color:#ae81ff">2019</span>-04-23 <span style="color:#ae81ff">15</span>:58:53 <span style="color:#f92672">[</span>INFO<span style="color:#f92672">]</span> Beginning amination! Package: python
+<span style="color:#ae81ff">2019</span>-04-23 <span style="color:#ae81ff">15</span>:58:53 <span style="color:#f92672">[</span>INFO<span style="color:#f92672">]</span> Connecting to EC2
+<span style="color:#ae81ff">2019</span>-04-23 <span style="color:#ae81ff">15</span>:58:53 <span style="color:#f92672">[</span>INFO<span style="color:#f92672">]</span> Aminating in region us-east-1
+<span style="color:#ae81ff">2019</span>-04-23 <span style="color:#ae81ff">15</span>:58:53 <span style="color:#f92672">[</span>INFO<span style="color:#f92672">]</span> Resolving base AMI
+<span style="color:#ae81ff">2019</span>-04-23 <span style="color:#ae81ff">15</span>:58:53 <span style="color:#f92672">[</span>INFO<span style="color:#f92672">]</span> loading cached ami details <span style="color:#00a8c8">for</span> ami-0a313d6098716f372
+<span style="color:#ae81ff">2019</span>-04-23 <span style="color:#ae81ff">15</span>:58:53 <span style="color:#f92672">[</span>INFO<span style="color:#f92672">]</span> Successfully resolved ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-20190212.1<span style="color:#f92672">(</span>ami-0a313d6098716f372<span style="color:#f92672">)</span>
+<span style="color:#ae81ff">2019</span>-04-23 <span style="color:#ae81ff">15</span>:58:54 <span style="color:#f92672">[</span>INFO<span style="color:#f92672">]</span> Searching <span style="color:#00a8c8">for</span> an available block device
+<span style="color:#ae81ff">2019</span>-04-23 <span style="color:#ae81ff">15</span>:58:54 <span style="color:#f92672">[</span>INFO<span style="color:#f92672">]</span> Block device /dev/xvdg allocated
+<span style="color:#ae81ff">2019</span>-04-23 <span style="color:#ae81ff">15</span>:59:05 <span style="color:#f92672">[</span>INFO<span style="color:#f92672">]</span> Checking and repairing root volume as necessary
+<span style="color:#ae81ff">2019</span>-04-23 <span style="color:#ae81ff">15</span>:59:05 <span style="color:#f92672">[</span>INFO<span style="color:#f92672">]</span> Attempting to resize root fs to fill volume
+<span style="color:#ae81ff">2019</span>-04-23 <span style="color:#ae81ff">15</span>:59:05 <span style="color:#f92672">[</span>INFO<span style="color:#f92672">]</span> Growing partition <span style="color:#00a8c8">if</span> necessary
+<span style="color:#ae81ff">2019</span>-04-23 <span style="color:#ae81ff">15</span>:59:06 <span style="color:#f92672">[</span>INFO<span style="color:#f92672">]</span> performing a repo install of python
+
+root#                            &lt;<span style="color:#f92672">====</span> you are dropped into chrooted terminal 
+
+root# apt-get install python-pip &lt;<span style="color:#f92672">====</span> install pip
+
+root# pip install ansible        &lt;<span style="color:#f92672">====</span> install ansible
+
+root# <span style="color:#111">exit</span>                       &lt;<span style="color:#f92672">====</span> <span style="color:#111">exit</span> to get out of chroot terminal session
+
+....
+
+<span style="color:#ae81ff">2019</span>-04-23 <span style="color:#ae81ff">17</span>:41:56 <span style="color:#f92672">[</span>INFO<span style="color:#f92672">]</span> Provisioning succeeded!
+
+....</code></pre></div>
+<p><strong>This manual step is only needed for foundation AMI. It&rsquo;s not ideal but this is the best I can do at this point.</strong></p>
+
+<div class="alert 
+alert-success"
+ 
+role="alert">Your foundation image AMI should show up in AWS EC2 Dashboard. We will use foundation AMI ID in creating base image next. Make sure to grab the foundation AMI ID from AWS EC2 dashboard.</div>
+
+
+<h2 id="creating-base-image">Creating Base Image</h2>
+
+<hr />
+
+<p>I chose to use Ansible provisioner to install software for base AMI. I could have used deb, rpm, Chef and Puppet provisioner.</p>
+
+<p>Check out my Ansible playbook into /root/playbooks. the ansible plugin config from above section expects this location.</p>
+
+<pre><code>cd /root
+git clone https://github.com/7onetella/playbooks.git
+</code></pre>
+
+<p>Animate the base</p>
+
+<pre><code>aminate -n base -e ec2_ansible_linux -B ami-1234567890-foundation-ami-id --extra-vars &quot;ansible_distribution=Ubuntu&quot; \
+--enhanced-networking \
+--ena-networking \
+--arch x86_64 \
+--provisioner-ebs-type gp2 \
+--register-ebs-type gp2 \
+--vm-type hvm \
+--partition 1 \
+base-ubuntu.yml
+</code></pre>
+
+<div class="alert 
+alert-success"
+ 
+role="alert">Your base AMI is now ready. Make sure to grab the base AMI ID from AWS EC2 dashboard to use during creation of application AMI.</div>
+
+
+<h2 id="creating-application-ami">Creating Application AMI</h2>
+
+<hr />
+
+<p>Define Ansible playbook for your application AMI. Repeat the same step from base AMI creation with your app ansible playbook.</p>
+
+<p>Animate the application AMI</p>
+
+<pre><code>aminate -n myapp -e ec2_ansible_linux -B ami-1234567890-base-ami-id --extra-vars &quot;myappvar1=foo&quot; \
+--enhanced-networking \
+--ena-networking \
+--arch x86_64 \
+--provisioner-ebs-type gp2 \
+--register-ebs-type gp2 \
+--vm-type hvm \
+--partition 1 \
+myapp.yml
+</code></pre>
+
+<div class="alert 
+alert-success"
+ 
+role="alert">This concludes Creating AMI using Netflix Aminator.</div>
+
+
+<p><strong>Application AMI Candidates</strong></p>
+
+<ul>
+<li><p>Jenikins Application Image extends Java 11 base images</p></li>
+
+<li><p>Fabio Application Image</p></li>
+
+<li><p>Promethius Application Image</p></li>
+
+<li><p>LDAP server Application Image</p></li>
+
+<li><p>Consul Application Image</p></li>
+
+<li><p>Redis Application Image</p></li>
+
+<li><p>Grafana Application Image</p></li>
+</ul>
+
+<p><br></p>
+
+<h2 id="todo">TODO</h2>
+
+<ol>
+<li>Create Jenkins for aminating application AMI</li>
+<li>Use <a href="https://serverspec.org/">ServerSpec</a> to validate the server image.</li>
+</ol>
+
+<p><strong>Reference material on baking and frying:</strong></p>
+
+<p>This talk gives a good overview on baking and frying. I would highly recommend it. <a href="https://www.youtube.com/watch?v=L-DMwEN_mUk">YouTube Video - Packer @ Pinterst</a></p>
+
+<p><strong>Tools:</strong></p>
+
+<p>A good way to creating deb package is using <a href="https://github.com/goreleaser/nfpm">nfpm</a></p>
+
+
+    
+    
+        <div class="chevrons">
+    <div id="navigation">
+<a class="nav nav-prev" href="/provisioning/" title="Provisioning"> <i class="fa fa-chevron-left"></i><label>Provisioning</label></a>
+    <a class="nav nav-next" href="/provisioning/foundation-image/" title="Foundation Image" style="margin-right: 0px;"><label>Foundation Image</label><i class="fa fa-chevron-right"></i></a></div>
+  </div>
+
+  </section>
+</article>
+
+<footer>
+
+<div class="footline">
+    
+    <div class="tags"> 
+      
+        <a class="label label-default" href="/tags/aws">AWS</a>
+      
+        <a class="label label-default" href="/tags/devops">devops</a>
+      
+        <a class="label label-default" href="/tags/ami">AMI</a>
+      
+        <a class="label label-default" href="/tags/baking">Baking</a>
+      
+        <a class="label label-default" href="/tags/frying">Frying</a>
+      
+    </div>
+    
+
+    
+
+    
+    <div class="date">
+        <i class='fa fa-calendar'></i> Last update on 01/05/2019
+    </div>
+    
+
+    
+    <div class="github-link">
+      <a href="https://github.com/vjeantet/hugo-theme-docdock/edit/master/exampleSite/content/provisioning/aminator.md" target="blank"><i class="fa fa-code-fork"></i>
+        Improve this page</a>
+    </div>
+    
+  </div>
+
+
+	<div>
+
+
+  
+    <hr />
+
+<p>references font awesome icons <a href="https://fontawesome.com/v4.7.0/icons/">https://fontawesome.com/v4.7.0/icons/</a></p>
+
+  
+
+
+
+	</div>
+</footer>
+
+<script src="/js/clipboard.min.js"></script>
+
+<link href="/css/featherlight.min.css" rel="stylesheet">
+<script src="/js/featherlight.min.js"></script>
+
+
+
+<script src="/theme-flex/script.js"></script>
+
+
+    
+
+    
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <url>
+    <loc>/provisioning/aminator/</loc>
+    <lastmod>2019-05-01T09:21:27-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/provisioning/foundation-image/</loc>
+    <lastmod>2019-04-19T14:22:51-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/provisioning/cloudformation-template/</loc>
+    <lastmod>2018-05-08T09:05:27-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/about/</loc>
+    <lastmod>2014-04-09T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/contact/</loc>
+    <lastmod>2014-04-09T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/_footer/</loc>
+  </url>
+  
+  <url>
+    <loc>/_header/</loc>
+  </url>
+  
+  <url>
+    <loc>/</loc>
+    <lastmod>2019-05-01T09:21:27-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/demo/_header/</loc>
+  </url>
+  
+  <url>
+    <loc>/provisioning/_header/</loc>
+  </url>
+  
+  <url>
+    <loc>/tags/ami/</loc>
+    <lastmod>2019-05-01T09:21:27-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/aminator/</loc>
+    <lastmod>2019-04-19T14:22:51-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/aws/</loc>
+    <lastmod>2019-05-01T09:21:27-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/baking/</loc>
+    <lastmod>2019-05-01T09:21:27-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/categories/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/cloudformation/</loc>
+    <lastmod>2018-05-08T09:05:27-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/demo/</loc>
+  </url>
+  
+  <url>
+    <loc>/tags/devops/</loc>
+    <lastmod>2019-05-01T09:21:27-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/frying/</loc>
+    <lastmod>2019-05-01T09:21:27-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/howto/</loc>
+    <lastmod>2019-04-19T14:22:51-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/hvm/</loc>
+    <lastmod>2019-04-19T14:22:51-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/netflix/</loc>
+    <lastmod>2019-04-19T14:22:51-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/ops/</loc>
+    <lastmod>2018-05-08T09:05:27-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/provisioning/</loc>
+    <lastmod>2019-05-01T09:21:27-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/</loc>
+    <lastmod>2019-05-01T09:21:27-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/template/</loc>
+    <lastmod>2018-05-08T09:05:27-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+</urlset>

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>DocDock Documentation</title>
+    
+      <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="revised" content="2019-05-21T17:40:16 EDT">
+<title>Foundation Image :: DocDock Documentation</title>
+<link rel="shortcut icon" href="/images/favicon.png" type="image/x-icon" />
+<link href="/css/font-awesome.min.css" rel="stylesheet">
+<link href="/css/nucleus.css" rel="stylesheet">
+<link href="/theme-flex/style.css" rel="stylesheet">
+
+<link rel="stylesheet" href="/css/bootstrap.min.css">
+<script src="/js/jquery-2.x.min.js"></script>
+<script type="text/javascript">
+      var baseurl = "\/";
+</script>
+<link rel="stylesheet" href="/css/custom.css">
+
+    
+  </head>
+  <body data-url="/provisioning/foundation-image/">
+    
+      <header>
+  <div class="logo">
+    
+	
+  
+    <p>7onetella</p>
+
+  
+
+
+  </div>
+  <div class="burger"><a href="javascript:void(0);" style="font-size:15px;">&#9776;</a></div>
+    <nav class="shortcuts">
+            <li class="" role="">
+                <a href="https://github.com/7onetella"  rel="noopener">
+                  <i class='fa fa-github'></i> <label>Github repo</label>
+                </a>
+            </li>
+    </nav>
+</header>
+<article>
+  <aside>
+    <ul class="menu">
+    <li data-nav-id="/provisioning/" class="dd-item parent haschildren
+        ">
+      <div>
+      <a href="/provisioning/"><i class='fa fa-cloud-upload'></i>&nbsp;Provisioning</a>
+            <i class="fa fa-angle-down fa-lg category-icon"></i><i class="fa fa-circle-thin read-icon"></i>
+      </div>
+        <ul>
+      <li data-nav-id="/provisioning/aminator/" class="dd-item">
+        <div>
+          <a href="/provisioning/aminator/">
+            Baking using Aminator
+          </a><i class="fa fa-circle-thin read-icon"></i>
+        </div>
+    </li>
+      <li data-nav-id="/provisioning/foundation-image/" class="dd-item active">
+        <div>
+          <a href="/provisioning/foundation-image/">
+            Foundation Image
+          </a><i class="fa fa-circle-thin read-icon"></i>
+        </div>
+    </li>
+      <li data-nav-id="/provisioning/cloudformation-template/" class="dd-item">
+        <div>
+          <a href="/provisioning/cloudformation-template/">
+            AWS CloudFormation Template
+          </a><i class="fa fa-circle-thin read-icon"></i>
+        </div>
+    </li>
+      <li data-nav-id="/provisioning/_header/" class="dd-item">
+        <div>
+          <a href="/provisioning/_header/">
+            
+          </a><i class="fa fa-circle-thin read-icon"></i>
+        </div>
+    </li>
+        </ul>
+    </li>
+    <li data-nav-id="/demo/" class="dd-item alwaysopen haschildren
+        ">
+      <div>
+      <a href="/demo/"><i class='fa fa-tv'></i>&nbsp;Demo</a>
+            <i class="fa fa-angle-down fa-lg category-icon"></i><i class="fa fa-circle-thin read-icon"></i>
+      </div>
+        <ul>
+      <li data-nav-id="/demo/_header/" class="dd-item">
+        <div>
+          <a href="/demo/_header/">
+            
+          </a><i class="fa fa-circle-thin read-icon"></i>
+        </div>
+    </li>
+        </ul>
+    </li>
+
+
+
+
+    </ul>
+    <section>
+    </section>
+  </aside>
+  <section class="page">
+    
+    <div class="nav-select">
+      <center>Navigation : 
+        <select onchange="javascript:location.href = this.value;">
+          
+    <option value="/provisioning/" >
+   Provisioning</option> 
+      <option value="/provisioning/aminator/" >- Baking using Aminator</option>
+      <option value="/provisioning/foundation-image/"  selected>- Foundation Image</option>
+      <option value="/provisioning/cloudformation-template/" >- AWS CloudFormation Template</option>
+      <option value="/provisioning/_header/" >- </option>
+  
+    <option value="/demo/" >
+   Demo</option> 
+      <option value="/demo/_header/" >- </option>
+  
+
+
+
+        </select>
+      </center>
+    </div>
+      <div>
+        <div class="searchbox">
+          <input data-search-input id="search-by" type="text" placeholder="Search...">
+        </div>
+        <script type="text/javascript" src="/js/lunr.min.js"></script>
+        <script type="text/javascript" src="/js/auto-complete.js"></script>
+        <link href="/css/auto-complete.css" rel="stylesheet">
+        <script type="text/javascript">
+          
+              var baseurl = "\/";
+          
+        </script>
+        <script type="text/javascript" src="/js/search.js"></script>
+      </div>
+    
+
+    <h1>Foundation Image</h1>
+    
+    
+    
+    
+
+<h3 id="purpose">Purpose</h3>
+
+<p>This is my notes on creating foundation image and how I failed. I found a <a href="/provisioning/aminator/">workaround</a> instead. I will come back to this later on for the sake of learning more about Linux boot process.</p>
+
+<hr />
+
+<h3 id="building-foundation-ami">Building Foundation AMI</h3>
+
+<ul>
+<li>apt-get update &amp;&amp; apt-get install -y python python-pip python3 python3-pip</li>
+</ul>
+
+<h3 id="create-the-volume">Create the volume</h3>
+
+<pre><code># aws ec2 create-volume --size 8 --volume-type standard --region us-east-1 --availability-zone us-east-1a --tag-specifications 'ResourceType=volume,Tags=[{Key=Name,Value=foundation-vol}]'
+{
+    &quot;AvailabilityZone&quot;: &quot;us-east-1a&quot;,
+    &quot;Tags&quot;: [
+        {
+            &quot;Value&quot;: &quot;foundation-vol&quot;,
+            &quot;Key&quot;: &quot;Name&quot;
+        }
+    ],
+    &quot;Encrypted&quot;: false,
+    &quot;VolumeType&quot;: &quot;gp2&quot;,
+    &quot;VolumeId&quot;: &quot;vol-057fc42f851326e6b&quot;,
+    &quot;State&quot;: &quot;creating&quot;,
+    &quot;Iops&quot;: 100,
+    &quot;SnapshotId&quot;: &quot;&quot;,
+    &quot;CreateTime&quot;: &quot;2019-04-18T15:49:25.000Z&quot;,
+    &quot;Size&quot;: 10
+}
+</code></pre>
+
+<h3 id="make-sure-the-volume-is-available">Make sure the volume is &lsquo;Available&rsquo;</h3>
+
+<pre><code># aws ec2 describe-volumes --volume-ids vol-057fc42f851326e6b --region us-east-1
+{
+    &quot;Volumes&quot;: [
+        {
+            &quot;AvailabilityZone&quot;: &quot;us-east-1a&quot;,
+            &quot;Attachments&quot;: [],
+            &quot;Encrypted&quot;: false,
+            &quot;VolumeType&quot;: &quot;gp2&quot;,
+            &quot;VolumeId&quot;: &quot;vol-057fc42f851326e6b&quot;,
+            &quot;State&quot;: &quot;available&quot;,
+            &quot;Iops&quot;: 100,
+            &quot;SnapshotId&quot;: &quot;&quot;,
+            &quot;CreateTime&quot;: &quot;2019-04-18T15:46:32.781Z&quot;,
+            &quot;Size&quot;: 10
+        }
+    ]
+}
+</code></pre>
+
+<h3 id="get-instance-id-of-the-current-ec2-instance">Get instance id of the current EC2 instance</h3>
+
+<pre><code>instance_id=$(curl http://169.254.169.254/latest/meta-data/instance-id)
+</code></pre>
+
+<h3 id="attach-volume">Attach volume</h3>
+
+<pre><code># aws ec2 attach-volume --device /dev/xvdf --volume-id vol-057fc42f851326e6b --instance-id ${instance_id} --region us-east-1
+{
+    &quot;AttachTime&quot;: &quot;2019-04-18T16:02:10.180Z&quot;,
+    &quot;InstanceId&quot;: &quot;i-0dd1f97339d08b532&quot;,
+    &quot;VolumeId&quot;: &quot;vol-057fc42f851326e6b&quot;,
+    &quot;State&quot;: &quot;attaching&quot;,
+    &quot;Device&quot;: &quot;/dev/xvdf&quot;
+}
+</code></pre>
+
+<h3 id="download-ubuntu-16-04-lts">Download Ubuntu 16.04 LTS</h3>
+
+<p>Top portion of this page <a href="http://cloud-images.ubuntu.com/releases/16.04/release/">http://cloud-images.ubuntu.com/releases/16.04/release/</a>
+has the tar file that contains img inside</p>
+
+<pre><code>curl -O http://cloud-images.ubuntu.com/releases/16.04/release/ubuntu-16.04-server-cloudimg-amd64.tar.gz
+</code></pre>
+
+<pre><code># time dd if=xenial-server-cloudimg-amd64.img of=/dev/xvdf
+2037760+0 records in
+2037760+0 records out
+1043333120 bytes (1.0 GB, 995 MiB) copied, 86.3559 s, 12.1 MB/s
+</code></pre>
+
+<div class="notices note" ><p>I think this is where the problem is. I looked for MBR records on the mounted volume after execution of dd completed. I didn&rsquo;t find any. At this point, using existing Ubuntu AMI seemed more appealing.</p>
+</div>
+
+
+<h3 id="detach-volume">Detach volume</h3>
+
+<pre><code># aws ec2 detach-volume --volume-id vol-057fc42f851326e6b --region us-east-1
+{
+    &quot;AttachTime&quot;: &quot;2019-04-18T16:02:10.000Z&quot;,
+    &quot;InstanceId&quot;: &quot;i-0dd1f97339d08b532&quot;,
+    &quot;VolumeId&quot;: &quot;vol-0f9bbdab164f1bb47&quot;,
+    &quot;State&quot;: &quot;detaching&quot;,
+    &quot;Device&quot;: &quot;/dev/xvdf&quot;
+}
+</code></pre>
+
+<h3 id="create-snapshot">Create snapshot</h3>
+
+<pre><code># aws ec2 create-snapshot --description &quot;foundation snapshot&quot; --volume-id vol-057fc42f851326e6b --region us-east-1 --tag-specifications 'ResourceType=snapshot,Tags=[{Key=Name,Value=foundation-ami}]'
+{
+    &quot;Description&quot;: &quot;foundation snapshot&quot;,
+    &quot;Tags&quot;: [
+        {
+            &quot;Value&quot;: &quot;foundation-ami&quot;,
+            &quot;Key&quot;: &quot;Name&quot;
+        }
+    ],
+    &quot;Encrypted&quot;: false,
+    &quot;VolumeId&quot;: &quot;vol-057fc42f851326e6b&quot;,
+    &quot;State&quot;: &quot;pending&quot;,
+    &quot;VolumeSize&quot;: 10,
+    &quot;StartTime&quot;: &quot;2019-04-18T17:53:11.000Z&quot;,
+    &quot;Progress&quot;: &quot;&quot;,
+    &quot;OwnerId&quot;: &quot;055106649878&quot;,
+    &quot;SnapshotId&quot;: &quot;snap-0d73511d18139bfed&quot;
+}
+</code></pre>
+
+<h3 id="todo-register-ami">TODO: Register AMI</h3>
+
+
+    
+    
+        <div class="chevrons">
+    <div id="navigation">
+<a class="nav nav-prev" href="/provisioning/aminator/" title="Baking using Aminator"> <i class="fa fa-chevron-left"></i><label>Baking using Aminator</label></a>
+    <a class="nav nav-next" href="/provisioning/cloudformation-template/" title="AWS CloudFormation Template" style="margin-right: 0px;"><label>AWS CloudFormation Template</label><i class="fa fa-chevron-right"></i></a></div>
+  </div>
+
+  </section>
+</article>
+
+<footer>
+
+<div class="footline">
+    
+    <div class="tags"> 
+      
+        <a class="label label-default" href="/tags/netflix">Netflix</a>
+      
+        <a class="label label-default" href="/tags/aminator">Aminator</a>
+      
+        <a class="label label-default" href="/tags/ami">AMI</a>
+      
+        <a class="label label-default" href="/tags/howto">HowTo</a>
+      
+        <a class="label label-default" href="/tags/hvm">HVM</a>
+      
+    </div>
+    
+
+    
+
+    
+    <div class="date">
+        <i class='fa fa-calendar'></i> Last update on 19/04/2019
+    </div>
+    
+
+    
+    <div class="github-link">
+      <a href="https://github.com/vjeantet/hugo-theme-docdock/edit/master/exampleSite/content/provisioning/foundation-image.md" target="blank"><i class="fa fa-code-fork"></i>
+        Improve this page</a>
+    </div>
+    
+  </div>
+
+
+	<div>
+
+
+  
+    <hr />
+
+<p>references font awesome icons <a href="https://fontawesome.com/v4.7.0/icons/">https://fontawesome.com/v4.7.0/icons/</a></p>
+
+  
+
+
+
+	</div>
+</footer>
+
+<script src="/js/clipboard.min.js"></script>
+
+<link href="/css/featherlight.min.css" rel="stylesheet">
+<script src="/js/featherlight.min.js"></script>
+
+
+
+<script src="/theme-flex/script.js"></script>
+
+
+    
+
+    
+    
+
+    
+  </body>
+</html>

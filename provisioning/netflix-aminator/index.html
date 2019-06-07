@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>DocDock Documentation</title>
+    
+      <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="revised" content="2019-04-23T04:09:33 EDT">
+<title>Netflix Aminator :: DocDock Documentation</title>
+<link rel="shortcut icon" href="/images/favicon.png" type="image/x-icon" />
+<link href="/css/font-awesome.min.css" rel="stylesheet">
+<link href="/css/nucleus.css" rel="stylesheet">
+<link href="/theme-flex/style.css" rel="stylesheet">
+
+<link rel="stylesheet" href="/css/bootstrap.min.css">
+<script src="/js/jquery-2.x.min.js"></script>
+<script type="text/javascript">
+      var baseurl = "\/";
+</script>
+<meta name="description" content="">
+
+
+
+    
+  </head>
+  <body data-url="/provisioning/netflix-aminator/">
+    
+      <header>
+  <div class="logo">
+    
+	
+  
+    <p>7onetella</p>
+
+  
+
+
+  </div>
+  <div class="burger"><a href="javascript:void(0);" style="font-size:15px;">&#9776;</a></div>
+    <nav class="shortcuts">
+            <li class="" role="">
+                <a href="https://github.com/7onetella"  rel="noopener">
+                  <i class='fa fa-github'></i> <label>Github repo</label>
+                </a>
+            </li>
+    </nav>
+</header>
+<article>
+  <aside>
+    <ul class="menu">
+          <li data-nav-id="/" class="dd-item">
+          <a href="/">
+            <i class="fa fa-fw fa-home"></i>
+          </a>
+          </li>
+    <li data-nav-id="/provisioning/" class="dd-item parent haschildren
+        ">
+      <div>
+      <a href="/provisioning/"><i class='fa fa-cloud-upload'></i>&nbsp;Provisioning</a>
+            <i class="fa fa-angle-down fa-lg category-icon"></i><i class="fa fa-circle-thin read-icon"></i>
+      </div>
+        <ul>
+      <li data-nav-id="/provisioning/baking/" class="dd-item">
+        <div>
+          <a href="/provisioning/baking/">
+            Creating AMI
+          </a><i class="fa fa-circle-thin read-icon"></i>
+        </div>
+    </li>
+      <li data-nav-id="/provisioning/netflix-aminator/" class="dd-item active">
+        <div>
+          <a href="/provisioning/netflix-aminator/">
+            Netflix Aminator
+          </a><i class="fa fa-circle-thin read-icon"></i>
+        </div>
+    </li>
+      <li data-nav-id="/provisioning/cloudformation-template/" class="dd-item">
+        <div>
+          <a href="/provisioning/cloudformation-template/">
+            How to better manage your ECS services in AWS cloud
+          </a><i class="fa fa-circle-thin read-icon"></i>
+        </div>
+    </li>
+      <li data-nav-id="/provisioning/_header/" class="dd-item">
+        <div>
+          <a href="/provisioning/_header/">
+            
+          </a><i class="fa fa-circle-thin read-icon"></i>
+        </div>
+    </li>
+        </ul>
+    </li>
+    <li data-nav-id="/post/" class="dd-item haschildren
+        ">
+      <div>
+      <a href="/post/"><i class='fa fa-commenting'></i>&nbsp;Docker</a><i class="fa fa-angle-right fa-lg category-icon"></i><i class="fa fa-circle-thin read-icon"></i>
+      </div>
+        <ul>
+      <li data-nav-id="/post/story-behind-alpinegovim/" class="dd-item">
+        <div>
+          <a href="/post/story-behind-alpinegovim/">
+            The story behind docker image &#34;alpinegovim&#34;
+          </a><i class="fa fa-circle-thin read-icon"></i>
+        </div>
+    </li>
+      <li data-nav-id="/post/_header/" class="dd-item">
+        <div>
+          <a href="/post/_header/">
+            
+          </a><i class="fa fa-circle-thin read-icon"></i>
+        </div>
+    </li>
+        </ul>
+    </li>
+
+
+
+
+    </ul>
+    <section>
+    </section>
+  </aside>
+  <section class="page">
+    
+    <div class="nav-select">
+      <center>Navigation : 
+        <select onchange="javascript:location.href = this.value;">
+          
+    <option value="/provisioning/" >
+   Provisioning</option> 
+      <option value="/provisioning/baking/" >- Creating AMI</option>
+      <option value="/provisioning/netflix-aminator/"  selected>- Netflix Aminator</option>
+      <option value="/provisioning/cloudformation-template/" >- How to better manage your ECS services in AWS cloud</option>
+      <option value="/provisioning/_header/" >- </option>
+  
+    <option value="/post/" >
+   Docker</option>
+
+
+
+        </select>
+      </center>
+    </div>
+      <div>
+        <div class="searchbox">
+          <input data-search-input id="search-by" type="text" placeholder="Search...">
+        </div>
+        <script type="text/javascript" src="/js/lunr.min.js"></script>
+        <script type="text/javascript" src="/js/auto-complete.js"></script>
+        <link href="/css/auto-complete.css" rel="stylesheet">
+        <script type="text/javascript">
+          
+              var baseurl = "\/";
+          
+        </script>
+        <script type="text/javascript" src="/js/search.js"></script>
+      </div>
+    
+
+    <h1>Netflix Aminator</h1>
+    
+    
+    
+    
+
+<h3 id="purpose">Purpose</h3>
+
+<p>I apologize for not making this page initially complete. I am publishing this page for documenting steps that I took to get aminator working for me. I can&rsquo;t promise if I am going to come back to this page to polish it up and make it understandable for general public.</p>
+
+<p>for those who are impatient. This works if you use my patched version of aminator. <a href="https://github.com/7onetella/aminator">https://github.com/7onetella/aminator</a></p>
+
+<pre><code>aminate -n mybase -c 7onetell -B ami-0a313d6098716f372 \
+--enhanced-networking \
+--arch x86_64 \
+--provisioner-ebs-type gp2 \
+--register-ebs-type gp2 \
+--vm-type hvm \
+--partition 1 \
+-e ec2_apt_linux \
+--debug \
+./hello-world_1.0.0_all.deb
+</code></pre>
+
+<p>I have a PR here. <a href="https://github.com/Netflix/aminator/pull/273">https://github.com/Netflix/aminator/pull/273</a></p>
+
+<hr />
+
+<h3 id="why-aminator">Why Aminator</h3>
+
+<p>I have used aminator back three to four years ago. The Wiki page on Netflix/aminator github page was complete enough for me to get aminator working in my environment. I used aminator back then for a short period time. Years has passed I am looking to create AMI using aminator again. The aminiator wiki is outdated now. Back then EC2 instance id was short and Ubutu 12 was the latest. Now I am looking to use Ubutu 18. Same Wiki doesn&rsquo;t quiet work well as I expected.</p>
+
+<p>Now that I got Aminator working as I want, I can now move onto HashCorp, Packer.</p>
+
+<hr />
+
+<h3 id="building-deb-package-to-bundle-my-application-artifact">Building deb package to bundle my application artifact</h3>
+
+<p>Build deb package: <a href="http://wiki.opf-labs.org/display/SP/The+Hello+World+Debian+Package">http://wiki.opf-labs.org/display/SP/The+Hello+World+Debian+Package</a></p>
+
+<p>apt-get install debhelper</p>
+
+<h3 id="building-foundation-ami">Building Foundation AMI</h3>
+
+<ul>
+<li><p>apt-get update &amp;&amp; apt-get install -y python python-pip python3 python3-pip</p></li>
+
+<li><p>Ubunto Official image site <a href="http://cloud-images.ubuntu.com/releases/">http://cloud-images.ubuntu.com/releases/</a></p></li>
+</ul>
+
+<h3 id="aws-credential-set-up">AWS credential set up</h3>
+
+<pre><code>export AWS_ACCESS_KEY_ID=YOUR_ACCESS_KEY
+export AWS_SECRET_ACCESS_KEY=YOUR_SECRET_ACCESS_KEY
+</code></pre>
+
+<h3 id="how-to-create-file-system">How to create file system</h3>
+
+<pre><code># mkfs -t ext4 /dev/xvdf
+
+mke2fs 1.44.1 (24-Mar-2018)
+Creating filesystem with 2621440 4k blocks and 655360 inodes
+Filesystem UUID: 2a88809f-03ac-45d8-8da3-0452435caa68
+Superblock backups stored on blocks:
+	32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632
+
+Allocating group tables: done
+Writing inode tables: done
+Creating journal (16384 blocks): done
+Writing superblocks and filesystem accounting information: done
+</code></pre>
+
+<h3 id="create-the-volume">Create the volume</h3>
+
+<pre><code># aws ec2 create-volume --size 8 --volume-type standard --region us-east-1 --availability-zone us-east-1a --tag-specifications 'ResourceType=volume,Tags=[{Key=Name,Value=foundation-vol}]'
+{
+    &quot;AvailabilityZone&quot;: &quot;us-east-1a&quot;,
+    &quot;Tags&quot;: [
+        {
+            &quot;Value&quot;: &quot;foundation-vol&quot;,
+            &quot;Key&quot;: &quot;Name&quot;
+        }
+    ],
+    &quot;Encrypted&quot;: false,
+    &quot;VolumeType&quot;: &quot;gp2&quot;,
+    &quot;VolumeId&quot;: &quot;vol-057fc42f851326e6b&quot;,
+    &quot;State&quot;: &quot;creating&quot;,
+    &quot;Iops&quot;: 100,
+    &quot;SnapshotId&quot;: &quot;&quot;,
+    &quot;CreateTime&quot;: &quot;2019-04-18T15:49:25.000Z&quot;,
+    &quot;Size&quot;: 10
+}
+</code></pre>
+
+<h3 id="make-sure-the-volume-is-available">Make sure the volume is &lsquo;Available&rsquo;</h3>
+
+<pre><code># aws ec2 describe-volumes --volume-ids vol-0f5534beb480b6c91 --region us-east-1
+{
+    &quot;Volumes&quot;: [
+        {
+            &quot;AvailabilityZone&quot;: &quot;us-east-1a&quot;,
+            &quot;Attachments&quot;: [],
+            &quot;Encrypted&quot;: false,
+            &quot;VolumeType&quot;: &quot;gp2&quot;,
+            &quot;VolumeId&quot;: &quot;vol-0f9bbdab164f1bb47&quot;,
+            &quot;State&quot;: &quot;available&quot;,
+            &quot;Iops&quot;: 100,
+            &quot;SnapshotId&quot;: &quot;&quot;,
+            &quot;CreateTime&quot;: &quot;2019-04-18T15:46:32.781Z&quot;,
+            &quot;Size&quot;: 10
+        }
+    ]
+}
+</code></pre>
+
+<h3 id="get-instance-id-of-the-current-ec2-instance">Get instance id of the current EC2 instance</h3>
+
+<pre><code>instance_id=$(curl http://169.254.169.254/latest/meta-data/instance-id)
+</code></pre>
+
+<h3 id="attach-volume">Attach volume</h3>
+
+<pre><code># aws ec2 attach-volume --device /dev/xvdf --volume-id vol-0f5534beb480b6c91 --instance-id ${instance_id} --region us-east-1
+{
+    &quot;AttachTime&quot;: &quot;2019-04-18T16:02:10.180Z&quot;,
+    &quot;InstanceId&quot;: &quot;i-0dd1f97339d08b532&quot;,
+    &quot;VolumeId&quot;: &quot;vol-0f9bbdab164f1bb47&quot;,
+    &quot;State&quot;: &quot;attaching&quot;,
+    &quot;Device&quot;: &quot;/dev/xvdf&quot;
+}
+</code></pre>
+
+<h3 id="download-ubuntu-16-04-lts">Download Ubuntu 16.04 LTS</h3>
+
+<p>Top portion of this page <a href="http://cloud-images.ubuntu.com/releases/16.04/release/">http://cloud-images.ubuntu.com/releases/16.04/release/</a>
+has the tar file that contains img inside</p>
+
+<pre><code>curl -O http://cloud-images.ubuntu.com/releases/16.04/release/ubuntu-16.04-server-cloudimg-amd64.tar.gz
+</code></pre>
+
+<pre><code># time dd if=xenial-server-cloudimg-amd64.img of=/dev/xvdf
+2037760+0 records in
+2037760+0 records out
+1043333120 bytes (1.0 GB, 995 MiB) copied, 86.3559 s, 12.1 MB/s
+</code></pre>
+
+<h3 id="detach-volume">Detach volume</h3>
+
+<pre><code># aws ec2 detach-volume --volume-id vol-025ed93c720e7cd90 --region us-east-1
+{
+    &quot;AttachTime&quot;: &quot;2019-04-18T16:02:10.000Z&quot;,
+    &quot;InstanceId&quot;: &quot;i-0dd1f97339d08b532&quot;,
+    &quot;VolumeId&quot;: &quot;vol-0f9bbdab164f1bb47&quot;,
+    &quot;State&quot;: &quot;detaching&quot;,
+    &quot;Device&quot;: &quot;/dev/xvdf&quot;
+}
+</code></pre>
+
+<h3 id="create-snapshot">Create snapshot</h3>
+
+<pre><code># aws ec2 create-snapshot --description &quot;foundation snapshot&quot; --volume-id vol-0f9bbdab164f1bb47 --region us-east-1 --tag-specifications 'ResourceType=snapshot,Tags=[{Key=Name,Value=foundation-ami}]'
+{
+    &quot;Description&quot;: &quot;foundation snapshot&quot;,
+    &quot;Tags&quot;: [
+        {
+            &quot;Value&quot;: &quot;foundation-ami&quot;,
+            &quot;Key&quot;: &quot;Name&quot;
+        }
+    ],
+    &quot;Encrypted&quot;: false,
+    &quot;VolumeId&quot;: &quot;vol-0f9bbdab164f1bb47&quot;,
+    &quot;State&quot;: &quot;pending&quot;,
+    &quot;VolumeSize&quot;: 10,
+    &quot;StartTime&quot;: &quot;2019-04-18T17:53:11.000Z&quot;,
+    &quot;Progress&quot;: &quot;&quot;,
+    &quot;OwnerId&quot;: &quot;055106649878&quot;,
+    &quot;SnapshotId&quot;: &quot;snap-0d73511d18139bfed&quot;
+}
+</code></pre>
+
+<h3 id="convert-from-paravirtual-to-hvm">Convert from paravirtual to HVM</h3>
+
+<p><a href="https://aws.amazon.com/premiumsupport/knowledge-center/migrate-linux-pv-hvm/">https://aws.amazon.com/premiumsupport/knowledge-center/migrate-linux-pv-hvm/</a></p>
+
+
+    
+    
+        <div class="chevrons">
+    <div id="navigation">
+<a class="nav nav-prev" href="/provisioning/baking/" title="Creating AMI"> <i class="fa fa-chevron-left"></i><label>Creating AMI</label></a>
+    <a class="nav nav-next" href="/provisioning/cloudformation-template/" title="How to better manage your ECS services in AWS cloud" style="margin-right: 0px;"><label>How to better manage your ECS services in AWS cloud</label><i class="fa fa-chevron-right"></i></a></div>
+  </div>
+
+  </section>
+</article>
+
+<footer>
+
+<div class="footline">
+    
+    <div class="tags"> 
+      
+        <a class="label label-default" href="/tags/netflix">Netflix</a>
+      
+        <a class="label label-default" href="/tags/aminator">Aminator</a>
+      
+        <a class="label label-default" href="/tags/ami">AMI</a>
+      
+        <a class="label label-default" href="/tags/howto">HowTo</a>
+      
+        <a class="label label-default" href="/tags/hvm">HVM</a>
+      
+    </div>
+    
+
+    
+
+    
+    <div class="date">
+        <i class='fa fa-calendar'></i> Last update on 19/04/2019
+    </div>
+    
+
+    
+    <div class="github-link">
+      <a href="https://github.com/vjeantet/hugo-theme-docdock/edit/master/exampleSite/content/provisioning/netflix-aminator.md" target="blank"><i class="fa fa-code-fork"></i>
+        Improve this page</a>
+    </div>
+    
+  </div>
+
+
+	<div>
+
+
+  
+    <hr />
+
+<p>references font awesome icons <a href="https://fontawesome.com/v4.7.0/icons/">https://fontawesome.com/v4.7.0/icons/</a></p>
+
+  
+
+
+
+	</div>
+</footer>
+
+<script src="/js/clipboard.min.js"></script>
+
+<link href="/css/featherlight.min.css" rel="stylesheet">
+<script src="/js/featherlight.min.js"></script>
+
+
+
+<script src="/theme-flex/script.js"></script>
+
+
+    
+
+    
+    
+
+    
+  </body>
+</html>
