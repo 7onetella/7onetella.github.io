@@ -5,7 +5,7 @@
     
       <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="revised" content="2019-05-21T17:40:16 EDT">
+<meta name="revised" content="2019-06-13T05:33:21 EDT">
 <title>Demo :: DocDock Documentation</title>
 <link rel="shortcut icon" href="/images/favicon.png" type="image/x-icon" />
 <link href="/css/font-awesome.min.css" rel="stylesheet">
@@ -147,7 +147,7 @@
 
 
 
-<h1 id="cloud-in-45-minutes-instead-of-7-days">Cloud in 45 minutes instead of 7 days</h1>
+<h1 id="cloud-in-90-minutes-instead-of-7-days">Cloud in 90 minutes instead of 7 days</h1>
 
 <hr />
 
@@ -157,7 +157,7 @@
 
 <iframe width="800" height="450" src="https://www.powtoon.com/embed/cjeLdPP4rWd/" frameborder="0"></iframe>
 
-<div class="notices note" ><p><strong>Did we say 7 days? That&rsquo;s too long. We will do all of this in 45 minutes or less. I am going to assume you have your AWS setup with a VPC.</strong></p>
+<div class="notices note" ><p><strong>Did we say 7 days? That&rsquo;s too long. We will do all of this in 90 minutes or less. I am going to assume you have your AWS setup with a VPC.</strong></p>
 </div>
 
 
@@ -192,21 +192,23 @@ aws ec2 run-instances \
 --image-id ami-0a313d6098716f372 \
 --count 1 \
 --instance-type t2.small \
---key-name mtv-key-pair \
---subnet-id subnet-936c5abb \
+--key-name 7onetella \
+--subnet-id subnet-1690dd4a \
+--security-group-ids sg-05f991edf7552116e \
 --associate-public-ip-address \
 --instance-initiated-shutdown-behavior terminate \
 --block-device-mappings 'DeviceName=/dev/sda1,Ebs={VolumeSize=20,DeleteOnTermination=true,VolumeType=gp2}' \
---tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=RemoteServer}]'
+--tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=remote-server}]'
 </code></pre>
 
-<div class="notices note" ><p>ami-0a313d6098716f372 is an Ubuntu 18.04 image. It didn&rsquo;t make sense to use previous versions when 18.04 is already not the latest. I had some trouble with Java 8 &amp; Java 11 but everything worked out fine.</p>
+<div class="notices note" ><p>ami-0a313d6098716f372 is an Ubuntu 18.04 image. It didn&rsquo;t make sense to use previous versions when 18.04 is already not the latest. I had some trouble with Java 8 &amp; Java 11 but everything worked out fine. Also, keep instance type as t2.small since aminator does not recoginize device prefix for newer generation of ec2 instance types like t3.</p>
 </div>
 
 
 <pre><code>ansible -i hosts remote-server --become -m raw -a &quot;apt-get -y install python2.7&quot; \
 &amp;&amp; ansible -i hosts remote-server --become -m raw -a &quot;apt-get update&quot; \
 &amp;&amp; ansible -i hosts remote-server --become -m raw -a &quot;apt-get -y install python-pip&quot; \
+&amp;&amp; ansible -i hosts remote-server --become -m raw -a &quot;apt-get -y install awscli&quot; \
 &amp;&amp; ansible -i hosts remote-server --become -m raw -a &quot;pip install ansible&quot;
 </code></pre>
 
@@ -260,7 +262,7 @@ aws ec2 run-instances \
 </div>
 
 
-<p>let&rsquo;s ssh into <em>remote-server</em> and run the following.</p>
+<p>Let&rsquo;s <strong>ssh into remote-server</strong> and run the following.</p>
 <div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo su - root
 
 <span style="color:#111">export</span> <span style="color:#111">AWS_ACCESS_KEY_ID</span><span style="color:#f92672">=</span>&lt;YOUR_ACCESS_KEY_ID&gt;
@@ -333,17 +335,11 @@ root# <span style="color:#111">exit</span>                       &lt;<span style
 <li>zip</li>
 </ul>
 
-<p>On the <em>remote-server</em> execute the following</p>
+<p>Execute the following from the same <strong>remote-server</strong> session</p>
 
-<pre><code>sudo su - root
+<pre><code>cd /var/playbooks
 
-export AWS_ACCESS_KEY_ID=&lt;YOUR_ACCESS_KEY_ID&gt;
-export AWS_SECRET_ACCESS_KEY=&lt;YOUR_SECRET_ACCESS_KEY&gt;
-history -c
-
-cd /var/playbooks
-
-export FOUNDATION_AMI_ID=&lt;AMI ID from previous step&gt;
+FOUNDATION_AMI_ID=&lt;AMI ID from previous step&gt;
 
 sudo -E aminate -n base_ubuntu -e ec2_ansible_linux -B ${FOUNDATION_AMI_ID} \
 --enhanced-networking \
@@ -366,15 +362,11 @@ base-ami-ubuntu.yml
 
 <h4 id="consul-baking">Consul - baking</h4>
 
-<p>On the <em>remote-server</em> execute the following</p>
+<p>Execute the following from the same <strong>remote-server</strong> session</p>
 
-<pre><code>export AWS_ACCESS_KEY_ID=&lt;YOUR_ACCESS_KEY_ID&gt;
-export AWS_SECRET_ACCESS_KEY=&lt;YOUR_SECRET_ACCESS_KEY&gt;
-history -c
+<pre><code>cd /var/playbooks
 
-cd /var/playbooks
-
-export BASE_AMI=&lt;Base AMI ID from previous step&gt;
+BASE_AMI=&lt;Base AMI ID from previous step&gt;
 
 sudo -E aminate -n consul-cluster -e ec2_ansible_linux -B ${BASE_AMI} --extra-vars &quot;ansible_distribution=Ubuntu&quot; \
 --enhanced-networking \
@@ -389,49 +381,72 @@ consul-cluster.yml
 
 <h4 id="consul-launching">Consul - launching</h4>
 
-<p>Grab the AMI ID from consol output and use it in the following command to finally launch <strong>Consol</strong>. It&rsquo;s recommended to use min of three instances for redundancy.</p>
+<p>Let&rsquo;s create minimal aws config without the key since our AWS key and secret are present in the shell session.</p>
 
-<pre><code>aws ec2 run-instances \
---image-id &lt;CONSUL_AMI_ID&gt; \
---count 3 \
---instance-type t2.medium \
---key-name mtv-key-pair \
---subnet-id subnet-936c5abb \
---associate-public-ip-address \
---instance-initiated-shutdown-behavior terminate \
---block-device-mappings 'DeviceName=/dev/sda1,Ebs={VolumeSize=20,DeleteOnTermination=true,VolumeType=gp2}' \
---tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=Consul}]'
+<pre><code># aws configure
+AWS Access Key ID [None]:
+AWS Secret Access Key [None]:
+Default region name [None]: us-east-1
+Default output format [None]: json
 </code></pre>
 
-<p>Create three A records in Route 53</p>
+<p>You will need to go to IAM &gt; Role and create the ec2 describe role with the following inline policy</p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#111">{</span>
+    <span style="color:#f92672">&#34;Version&#34;</span><span style="color:#111">:</span> <span style="color:#d88200">&#34;2012-10-17&#34;</span><span style="color:#111">,</span>
+    <span style="color:#f92672">&#34;Statement&#34;</span><span style="color:#111">:</span> <span style="color:#111">[</span>
+        <span style="color:#111">{</span>
+            <span style="color:#f92672">&#34;Effect&#34;</span><span style="color:#111">:</span> <span style="color:#d88200">&#34;Allow&#34;</span><span style="color:#111">,</span>
+            <span style="color:#f92672">&#34;Action&#34;</span><span style="color:#111">:</span> <span style="color:#d88200">&#34;ec2:Describe*&#34;</span><span style="color:#111">,</span>
+            <span style="color:#f92672">&#34;Resource&#34;</span><span style="color:#111">:</span> <span style="color:#d88200">&#34;*&#34;</span>
+        <span style="color:#111">}</span>
+    <span style="color:#111">]</span>
+<span style="color:#111">}</span></code></pre></div>
+<p>I named this role &ldquo;EC2ReadOnlyAccessRole&rdquo;</p>
 
-<ul>
-<li>consul.example.com A 172.31.41.168</li>
-<li>consul.example.com A 172.31.37.149</li>
-<li>consul.example.com A 172.31.38.198</li>
-</ul>
+<p><strong>Consul running in AWS</strong></p>
 
-<p><strong>Attach IAM Role</strong></p>
+<p>Our Consul instances will discover each other by calling &ldquo;DescribeInstances&rdquo; on ec2 instances before forming a cluster.</p>
 
-<p>Create a role called EC2ReadOnly with ec2:DescribeInstances permission and attach it to the three Consul ec2 instances.
-Our Consul instances will discover each other by calling &ldquo;DescribeInstances&rdquo; on ec2 instances before forming a cluster.</p>
+<p>Grab the AMI ID from consol output and use it in the following command to finally launch <strong>Consul</strong>. It&rsquo;s recommended to use min of three instances for redundancy.</p>
+
+<pre><code>CONSUL_AMI_ID=&lt;Consul AMI ID from previous step&gt;
+
+aws ec2 run-instances \
+--image-id ${CONSUL_AMI_ID} \
+--count 3 \
+--instance-type t3.micro \
+--key-name 7onetella \
+--subnet-id subnet-1690dd4a \
+--associate-public-ip-address \
+--security-group-ids sg-05f991edf7552116e \
+--instance-initiated-shutdown-behavior terminate \
+--iam-instance-profile 'Name=EC2ReadOnlyAccessRole' \
+--block-device-mappings 'DeviceName=/dev/sda1,Ebs={VolumeSize=20,DeleteOnTermination=true,VolumeType=gp2}' \
+--tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=consul}]'
+</code></pre>
+
+<p>Create A record with three IPs in Route 53</p>
+
+<p>consul.example.com</p>
+
+<p>172.31.36.95</p>
+
+<p>172.31.37.149</p>
+
+<p>172.31.38.198</p>
 
 <p>You can hit the Consul UI here =&gt; <a href="http://consul.example.com:8500/ui">http://consul.example.com:8500/ui</a>
 <br></p>
 
 <h4 id="fabio-baking">Fabio - baking</h4>
 
-<p>base ami: ami-022fcccf8bf7d91b5</p>
+<div class="notices note" ><p>You need to make sure to update the Ansible variable consul_cluster_hostname to the consul host name you created in previous step</p>
+</div>
 
-<pre><code>export AWS_ACCESS_KEY_ID=&lt;YOUR_ACCESS_KEY_ID&gt;
-export AWS_SECRET_ACCESS_KEY=&lt;YOUR_SECRET_ACCESS_KEY&gt;
-history -c
 
-cd /var/playbooks
+<pre><code>cd /var/playbooks
 
-export BASE_AMI=&lt;Base AMI ID&gt;
-
-sudo -E aminate -n fabio -e ec2_ansible_linux -B ${BASE_AMI} --extra-vars &quot;target=all consul_cluster_hostname=consul.example.com&quot; \
+aminate -n fabio -e ec2_ansible_linux -B ${BASE_AMI} --extra-vars &quot;target=all consul_cluster_hostname=consul.example.com&quot; \
 --enhanced-networking \
 --ena-networking \
 --arch x86_64 \
@@ -446,25 +461,33 @@ fabio.yml
 
 <p>Grab the AMI ID from consol output and use it in the following command to launch <strong>Fabio</strong>.</p>
 
-<pre><code>aws ec2 run-instances \
---image-id &lt;FABIO_AMI_ID&gt; \
+<p>You are still on the same <em>remote-server</em> session</p>
+
+<pre><code>FABIO_AMI_ID=&lt;Fabio AMI ID from previous session&gt;
+
+aws ec2 run-instances \
+--image-id ${FABIO_AMI_ID} \
 --count 1 \
---instance-type t2.medium \
---key-name mtv-key-pair \
---subnet-id subnet-936c5abb \
+--instance-type t3.micro \
+--key-name 7onetella \
+--subnet-id subnet-1690dd4a \
 --associate-public-ip-address \
+--security-group-ids sg-05f991edf7552116e \
 --instance-initiated-shutdown-behavior terminate \
 --block-device-mappings 'DeviceName=/dev/sda1,Ebs={VolumeSize=20,DeleteOnTermination=true,VolumeType=gp2}' \
---tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=FabioLB}]'
+--tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=fabio}]'
 </code></pre>
 
 <p>Create one A records in Route 53</p>
 
 <ul>
 <li>fabio.example.com A 172.31.41.100
-<br>
 <br></li>
 </ul>
+
+<p>You can hit the Fabio UI here =&gt; <a href="http://fabio.example.com:9998/">http://fabio.example.com:9998/</a>
+<br>
+<br></p>
 
 <h3 id="create-ecs-base-ami">Create ECS Base AMI</h3>
 
@@ -474,18 +497,15 @@ fabio.yml
 Fabio will pick up the route host/path info from Consul in the form of tags.</p>
 
 <div class="notices note" ><p>I hate to disappoint anyone but I am cheating here again instead of full automation. We are building another foundation/base AMI for ECS. This AMI will be combination of a foundation &amp; a base image.
-Lasiness always prevails. Don&rsquo;t judge me.</p>
+Laziness always prevails. Don&rsquo;t judge me.<br>
+<br>
+<strong>Please make sure to update consul_cluster_hostname value</strong></p>
 </div>
 
 
-<pre><code>sudo su - root
+<pre><code>cd /var/playbooks
 
-export AWS_ACCESS_KEY_ID=AKIAI3C4HGAAX2AOVXDA
-export AWS_SECRET_ACCESS_KEY=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
-export base_ami=ami-00cf4737e238866a3
-history -c
-
-sudo -E aminate -n base_ecs -B ${base_ami} \
+aminate -n base_ecs -B ami-00cf4737e238866a3 \
 --enhanced-networking \
 --ena-networking \
 --arch x86_64 \
@@ -496,20 +516,22 @@ sudo -E aminate -n base_ecs -B ${base_ami} \
 -i \
 python
 
-$ &lt;=== You are dropped into chrooted terminal, interactive mode. Excute the following. 
+# &lt;=== You are dropped into chrooted terminal, interactive mode. Excute the following. 
 
 yum install -y git \
 &amp;&amp; git clone https://github.com/7onetella/playbooks.git \
 &amp;&amp; cd playbooks \
 &amp;&amp; yum install -y python-pip \
 &amp;&amp; pip install ansible \
-&amp;&amp; ansible-playbook --extra-vars &quot;consul_cluster_hostname=consul.example.com&quot; consul-agent-local.yml \
+&amp;&amp; ansible-playbook --extra-vars &quot;consul_cluster_hostname=consul.example.com&quot; consul-local.yml \
+&amp;&amp; rm -rf /var/playbooks \
 &amp;&amp; exit
 </code></pre>
 
 <p>BTW, <strong>ami-00cf4737e238866a3</strong>. This AMI is the official ECS Optimized AMI ID for us-east-1 region.</p>
 
-<p>We will use the output AMI ID in EC2 Launch Configuration to launch multiple EC2 instances for running our apps. There are many YouTube videos on how to create Launch Configration, so I will skip this step.
+<p>This ECS AMI is to be used in Launch Configration as part of ECS Cluster Cloudformation template. I will try to post my Cloudformation template later on.
+Cloudformation or Terraform is a bit too much for this demo to cover. I am going to assume you already have a ECS cluster and launch configuration that is tied to autoscaling group.
 <br></p>
 
 <p>If you go to Consul UI now, you should see something similar to the following except the helloworld app. We will deploy our apps shortly.
@@ -519,21 +541,29 @@ yum install -y git \
 
 <hr />
 
-<p><strong>LDAP</strong> - You can use any ldap client to log in and take a look. I am using Apache Directory Studio.
-<img src="/images/ldap.png" alt="ldap directory" /></p>
+<p><strong>LDAP</strong> - You can use any ldap client to log in and take a look. I am using Apache Directory Studio.</p>
 
-<div class="notices note" ><p>ApacheDS LDAP server is running on port 10389<br>
+<div class="notices note" ><p>ApacheDS LDAP server is running on remote-server port 10389<br>
 Bind DN:  uid=admin,ou=system<br />
 Bind Password: secret<br>
 Regular User: doej<br>
 Reg. User Password: foo<br>
-Reg User Groups: developers and managers</p>
+Reg. User Groups: developers and managers</p>
 </div>
 
+
+<p><img src="/images/ldap.png" alt="ldap directory" /></p>
 
 <hr />
 
 <p><strong>Jenkins</strong> - We will use Jenkins for what it does best.</p>
+
+<p>Jenkins login page is <a href="http://remote-server:8080/login">http://remote-server:8080/login</a></p>
+
+<div class="notices note" ><p>user: admin<br>
+password: admin</p>
+</div>
+
 
 <p>You can optionally go to Jekins <a href="http://localhost:8080/configureSecurity/">Global Security Page</a> and set up Jenkins to use the LDAP for authentication.</p>
 
@@ -554,11 +584,6 @@ Reg User Groups: developers and managers</p>
 
 <p><img src="/images/jenkins_ldap_success.png" alt="ldap directory" /></p>
 
-<div class="notices note" ><p>user: admin<br>
-password: password</p>
-</div>
-
-
 <hr />
 
 <p><strong>Graphite</strong> - will be used to capture metrics data. LDAP user doej and the password works here.</p>
@@ -566,7 +591,7 @@ password: password</p>
 <p>Login page is <a href="http://remote-server/account/login">http://remote-server/account/login</a>
 <img src="/images/graphite_login.png" alt="Graphite login" />
 <div class="notices note" ><p>user: admin<br>
-password: password</p>
+password: admin</p>
 </div>
 </p>
 
@@ -577,7 +602,7 @@ password: password</p>
 <p>Login page is <a href="http://remote-server:3000/login">http://remote-server:3000/login</a>
 <img src="/images/grafana_login.png" alt="Grafana login" />
 <div class="notices note" ><p>user: admin<br>
-password: password</p>
+password: admin</p>
 </div>
 </p>
 
@@ -615,6 +640,33 @@ graph LR;
     Fabio -.- OurApp
     OurApp -.- Consul
 </div>
+
+<p>When our app comes up comes up it will register itself with Consul with urlprefix- tag.</p>
+
+<p>For example, our tester app will simply respond &ldquo;Hello World!!!&rdquo; when /helloworld endpoint is accessed.</p>
+
+<p><img src="/images/tester-main.png?classes=shadow" alt="tester main func" /></p>
+
+<p>The registraion of the app is done here</p>
+
+<p><img src="/images/tester-registration.png?classes=shadow" alt="tester registration" /></p>
+
+<p>I have created a docker image for tester app.</p>
+
+<p>docker image: 7onetella/tester:0.0.5</p>
+
+<p>Go ahead create ECS task definition and service.</p>
+
+<p>Once it&rsquo;s deployed fabio will pick up the route automatically.</p>
+
+<p>Note about failover using DNS:
+A record for consul with multiple ip addresses for DNS fail over is not the best.
+DNS client will round robin which means if one of the node is not available we are relying on client timeout to try next ip address in the list.
+If we wanted to avoid this, we need to update the DNS record as soon as one of the nodes go down.</p>
+
+<p>Note about Consul behavior:
+Consul constantly checks for health of consul clusters. If anyone of them becomes unavailable, it will try to make sure new leader is elected.
+In the case of three instances, the Consul will work as long as there is minimum two. Consul will stop working when there is only one instance running.</p>
 
 
 
